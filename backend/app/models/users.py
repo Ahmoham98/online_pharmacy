@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 
+# defining the basemodel
 
 class UsersBase(SQLModel):
     username: str
@@ -13,7 +14,7 @@ class UsersBase(SQLModel):
     created_at: str
 
 
-# defining the tabel
+# defining the table
 
 class User(UsersBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
