@@ -3,7 +3,7 @@ from .views import user_views
 
 app = FastAPI()
 
-app.include_router(user_views)
+app.include_router(user_views.router)
 
 
 def main():
