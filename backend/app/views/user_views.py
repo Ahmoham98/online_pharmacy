@@ -1,10 +1,9 @@
 from sqlmodel import Session, select
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..dependency import get_session
-from ..database import engine
-
-from ..models.users import Users, UsersBase, UsersCreate, UsersPublic, UsersUpdate
+from ..schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate
+from ..models.users import Users
 
 router = APIRouter()
 
@@ -14,9 +13,8 @@ router = APIRouter()
 async def get_users(
     *,
     session: Session = Depends(get_session),
-    user_id: int
 ):
-        users = session.get(Users, user_id)
+        users = session.exec(select(Users)).all()
         return users
 
 #Creating a post request endpoint to /users
@@ -40,4 +38,6 @@ async def get_user(
     user_id: int
 ):
     db_user = session.get(Users, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="user not found!")
     return db_user
