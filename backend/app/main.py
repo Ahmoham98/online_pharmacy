@@ -1,3 +1,9 @@
+from fastapi import FastAPI
+from .views import user_views
+
+app = FastAPI()
+
+app.include_router(user_views)
 
 
 def main():
