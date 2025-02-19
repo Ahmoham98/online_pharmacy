@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Field
 
 # Product model
 
@@ -7,36 +7,23 @@ class Productsbase(SQLModel):
     description: str
     image_url: str
     unit_price: int
-    sale_price: str
+    sale_price: int
     is_active: bool
     status: str
-    created_at: str
-    updated_at: str
+    created_at: str = Field(default="now")
+    updated_at: str = Field(default="now")
 
 # Product input model
 
 class ProductsCreate(Productsbase):
-    title: str
-    description: str
-    unit_price: int
-    sale_price: int
-    is_active: bool
-    status: str
-    created_at: str
-    updated_at: str
-
+    pass
 # Products Output model
 
 class ProductsPublic(Productsbase):
     id: int
     category_id: int
     users_id: int
-    title: str
-    description: str
-    unit_price: int
-    sale_price: int
-    is_active: bool
-    status: str
+
 
 #Products Update(Patch) model
 
@@ -47,7 +34,7 @@ class ProductUpdate(SQLModel):
     sale_price: int | None = None
     is_active: bool | None = None
     status: str | None = None
-    created_at: str | None = None
-    updated_at: str | None = None
+    created_at: str = Field(default="now")
+    updated_at: str = Field(default="now")
 
 
