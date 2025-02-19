@@ -8,10 +8,10 @@ class Products(SQLModel, table=True):
     users_id: int | None = Field(default=None, foreign_key="users.id")
     title: str | None = None
     description: str | None = None
-    image_url: str | None = None
-    unit_price: int | None = None
-    sale_price: str | None = None
-    is_active: bool | None = None
+    image_url: str
+    unit_price: int
+    sale_price: int | None = None
+    is_active: bool = Field(default=True)
     status: str | None = None 
     created_at: str | None = None
     updated_at: str | None = None
