@@ -36,6 +36,9 @@ class ProductsCreate(Productsbase):
 # define products output model
 
 class ProductsPublic(Productsbase):
+    id: int
+    category_id: int
+    users_id: int
     title: str
     description: str
     unit_price: int

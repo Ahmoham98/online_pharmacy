@@ -30,6 +30,7 @@ class UsersCreate(UsersBase):
 # user output model
 
 class UsersPublic(UsersBase):
+    id: int
     email: str | None = None
     phone: int | None = None
 
