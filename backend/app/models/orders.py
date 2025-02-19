@@ -30,7 +30,7 @@ class OrderPublic(OrderBase):
     status: str
     created_at: str = Field(default="now")
 
-class OrderUpdate(OrderBase):
+class OrderUpdate(SQLModel):
     total_price: int | None = None
     card_number: int | None = None
     card_expiration_date: int | None = None

@@ -47,7 +47,7 @@ class ProductsPublic(Productsbase):
 
 # define products update model
 
-class ProductUpdate(Productsbase):
+class ProductUpdate(SQLModel):
     title: str | None = None
     description: str | None = None
     unit_price: int | None = None
