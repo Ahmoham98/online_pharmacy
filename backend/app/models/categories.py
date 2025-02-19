@@ -1,7 +1,9 @@
 from sqlmodel import SQLModel, Field
 
 class CategoriesBase(SQLModel):
-    pass
+    category_name: str
+    description: str | None = None
+    created_at: str
 
 class Categories(CategoriesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -10,15 +12,11 @@ class Categories(CategoriesBase, table=True):
     created_at: str = Field(default="now")
 
 class CategoriesCreate(CategoriesBase):
-    category_name: str 
-    description: str | None = None
     created_at: str | None = None
 
 class CategoriesPublic(CategoriesBase):
-    id: int 
-    category_name: str
+    id: int
     description: str | None = None
-    created_at: str
 
 class CategoriesUpdate(CategoriesBase):
     id: int | None = None
