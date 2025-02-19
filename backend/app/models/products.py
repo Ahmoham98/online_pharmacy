@@ -1,4 +1,3 @@
-from datetime import datetime
 from sqlmodel import SQLModel, Field
 
 # defining product base model
