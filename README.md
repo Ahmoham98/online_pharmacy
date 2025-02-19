@@ -1,6 +1,7 @@
 #   what is all the code about?
-**-- webaplication...**\n
+**-- webaplication...**
+
 **-- with python language**
   # How we make it done?
-  **-- Framework: Fastapi**\n
+  **-- Framework: Fastapi**
   **-- Database: postgresql**
