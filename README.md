@@ -3,6 +3,6 @@
 
 **-- with python language**
   # How we make it done?
-  **-- $Framework: Fastapi**
+  **-- Framework: Fastapi**
   
   **-- Database: postgresql**
