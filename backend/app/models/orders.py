@@ -12,6 +12,7 @@ class OrderBase(SQLModel):
     discount: int
     status: str
     created_at: str = Field(default="now")
+    updated_at: str = Field(default="now")
 
 class Orders(OrderBase, table=True):
     id: int | None = Field(default=None, primary_key=True)

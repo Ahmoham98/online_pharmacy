@@ -15,12 +15,8 @@ class OrderItems(OrderItemsBase, table=True):
     product_id: int | None = Field(default=None, foreign_key="products.id")
     orders_id: int | None = Field(default=None, foreign_key="orders.id")
     
-    uint_price: int
-    sale_price: int
     amount: int
     total_price: int
-    status: str
-    is_active: bool
 
 # define order_items input model
 
