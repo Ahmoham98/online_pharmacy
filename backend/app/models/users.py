@@ -16,12 +16,12 @@ class UsersBase(SQLModel):
 
 # defining the table
 
-class User(UsersBase, table=True):
+class Users(UsersBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
 # user input model
 
-class UserCreate(UsersBase):
+class UsersCreate(UsersBase):
     email: str | None = None
     phone: int | None = None
     address: str | None = None
@@ -29,13 +29,13 @@ class UserCreate(UsersBase):
 
 # user output model
 
-class UserPublic(UsersBase):
+class UsersPublic(UsersBase):
     email: str | None = None
     phone: int | None = None
 
 # user update(patch) model
 
-class UserUpdate(SQLModel):
+class UsersUpdate(SQLModel):
     username: str | None = None
     password: str | None = None
     email: str | None = None
