@@ -42,3 +42,17 @@ async def read_products(
     if not db_product:
         raise HTTPException(status_code=404, detail="product with the given id not found! ")
     return db_product
+
+@router.delete("/{product_id}")
+async def delete_user(
+    *,
+    session: Session = Depends(get_session),
+    product_id: int
+):
+    db_product = session.get(Products, product_id)
+    if not db_product:
+        raise HTTPException(status_code=404, detail="product with given id not found! ")
+    session.delete(db_product)
+    session.commit()
+    
+    return {"message": "product deleted successfully!"}  # return a message to the client

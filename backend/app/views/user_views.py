@@ -43,3 +43,18 @@ async def get_user(
     if not db_user:
         raise HTTPException(status_code=404, detail="user not found!")
     return db_user
+
+@router.delete("/{user_id}")
+async def delete_user(
+    *,
+    session: Session = Depends(get_session),
+    user_id: int
+):
+    db_user = session.get(Users, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="user with given id not found! ")
+    session.delete(db_user)
+    session.commit()
+    
+    return {"message": "user deleted successfully!"}  # return a message to the client
+

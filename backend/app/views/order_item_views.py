@@ -42,3 +42,17 @@ async def get_order(
     if not order_items_id:
         raise HTTPException(status_code=404, detail="order_item with given id is not found! ")
     return order_items_id
+
+@router.delete("/{orderitem_id}")
+async def delete_user(
+    *,
+    session: Session = Depends(get_session),
+    order_item_id: int
+):
+    db_order_item = session.get(OrderItems, order_item_id)
+    if not db_order_item:
+        raise HTTPException(status_code=404, detail="order_item with given id not found! ")
+    session.delete(db_order_item)
+    session.commit()
+    
+    return {"message": "order_item deleted successfully!"}  # return a message to the client

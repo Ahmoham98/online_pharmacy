@@ -31,7 +31,7 @@ class UsersPublic(UsersBase):
 # User Update(Patch) model
 
 class UsersUpdate(SQLModel):
-    username: str | None = None
+    username: str 
     password: str | None = None
     email: str | None = None
     phone: int | None = None

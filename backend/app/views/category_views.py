@@ -42,3 +42,17 @@ async def get_order(
     if not db_category:
         raise HTTPException(status_code=404, detail="category with given id is not found! ")
     return db_category
+
+@router.delete("/{category_id}")
+async def delete_user(
+    *,
+    session: Session = Depends(get_session),
+    category_id: int
+):
+    db_category = session.get(Categories, category_id)
+    if not db_category:
+        raise HTTPException(status_code=404, detail="category with given id not found! ")
+    session.delete(db_category)
+    session.commit()
+    
+    return {"message": "category deleted successfully!"}  # return a message to the client
