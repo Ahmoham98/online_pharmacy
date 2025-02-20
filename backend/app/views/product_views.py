@@ -37,5 +37,5 @@ async def read_products(
 ):
     db_product = session.get(Products, product_id)
     if not db_product:
-        raise HTTPException(status_code=404, detail="product with the given id not found")
+        raise HTTPException(status_code=404, detail="product with the given id not found! ")
     return db_product
