@@ -63,8 +63,6 @@ async def update_order(
     session: Session = Depends(get_session),
     order: OrderUpdate
 ):
-    if order.card_number != Orders.card_number:
-        raise HTTPException(status_code=404, detail="order not found!")
     
     db_order = session.exec(select(Orders).where(order.card_number == Orders.card_number)).one()
 

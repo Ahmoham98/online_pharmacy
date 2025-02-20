@@ -64,8 +64,6 @@ async def update_user(
     session: Session = Depends(get_session),
     user: UsersUpdate
 ):
-    if user.username != Users.username:
-        raise HTTPException(status_code=404, detail="username not found!")
     
     db_user = session.exec(select(Users).where(user.username == Users.username)).one()
     if user.username is None:

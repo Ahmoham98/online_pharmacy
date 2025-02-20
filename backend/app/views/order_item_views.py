@@ -63,9 +63,6 @@ async def update_order_items(
     session: Session = Depends(get_session),
     order_items: OrderItemsUpdate
 ):
-    if order_items.title != OrderItems.title:
-        raise HTTPException(status_code=404, detail="order_item not found!")
-    
     db_order_items = session.exec(select(OrderItems).where(order_items.title == OrderItems.title)).one()
     
     if order_items.title is None:

@@ -63,8 +63,6 @@ async def update_product(
     session: Session = Depends(get_session),
     product: ProductUpdate
 ):
-    if product.title != Products.title:
-        raise HTTPException(status_code=404, detail="product not found!")
     
     db_product = session.exec(select(Products).where(product.title == Products.title)).one()
     if product.title is None:
