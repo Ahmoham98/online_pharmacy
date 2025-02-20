@@ -10,7 +10,7 @@ class CategoriesBase(SQLModel):
 # Categories Input model
 
 class CategoriesCreate(CategoriesBase):
-    created_at: str | None = Non
+    created_at: str | None = None
 
 # Categories Output models
 
