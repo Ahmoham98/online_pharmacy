@@ -1,4 +1,6 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
+
+from .users import Users
 
 # Orders table
     
@@ -17,3 +19,4 @@ class Orders(SQLModel, table=True):
     created_at: str = Field(default="now")
     updated_at: str = Field(default="now")
 
+    users: Users = Relationship(back_populates="orders")

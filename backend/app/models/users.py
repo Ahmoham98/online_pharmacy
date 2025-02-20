@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel, Field
-
+from sqlmodel import SQLModel, Field, Relationship
+from .orders import Orders
 # Users table
 
 class Users(SQLModel, table=True):
@@ -14,5 +14,5 @@ class Users(SQLModel, table=True):
     role: str | None = None
     created_at: str | None = None
 
-
+    orders: Orders = Relationship(back_populates="users")
 
