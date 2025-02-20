@@ -21,8 +21,7 @@ class CategoriesPublic(CategoriesBase):
 # Categories Update(Patch) model
 
 class CategoriesUpdate(CategoriesBase):
-    id: int | None = None
-    category_name: str | None = None
+    name: str | None = None
     description: str | None = None
     created_at: str | None = None
 

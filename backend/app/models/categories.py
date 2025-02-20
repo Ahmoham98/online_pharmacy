@@ -4,7 +4,7 @@ from sqlmodel import SQLModel, Field
 
 class Categories(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    category_name: str = Field(index=True)
+    name: str = Field(index=True)
     description: str | None = None
     category_name: str
     description: str | None = None
