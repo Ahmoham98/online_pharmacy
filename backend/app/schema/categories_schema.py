@@ -3,7 +3,7 @@ from sqlmodel import SQLModel
 # Categories model
 
 class CategoriesBase(SQLModel):
-    category_name: str
+    name: str
     description: str | None = None
     created_at: str
 

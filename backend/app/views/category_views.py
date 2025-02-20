@@ -61,7 +61,7 @@ async def delete_user(
 async def update_category(
     *,
     session: Session = Depends(get_session),
-    category: Categories
+    category: CategoriesCreate
 ):
     if category.name != Categories.name:
         raise HTTPException(status_code=404, detail="category not found!")
