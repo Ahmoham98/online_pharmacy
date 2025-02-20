@@ -16,6 +16,10 @@ def create_db_tables():
 def main():
     create_db_tables()
 
+@app.on_event("startup")
+def on_startup():
+    create_db_tables()
+
 
 if __name__ == "__main__":
     main()
