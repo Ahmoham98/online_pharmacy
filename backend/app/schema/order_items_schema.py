@@ -30,10 +30,8 @@ class OrderItemsPublic(OrderItemsBase):
 class OrderItemsUpdate(SQLModel):
     title: str | None = None
     description: str | None = None
-    unit_price: int | None = None
-    sale_price: int | None = None
-    is_active: bool | None = None
-    status: str | None = None
+    amount: int | None = None
+    total_price: int | None = None
     created_at: str | None = None
     updated_at: str | None = None
 
