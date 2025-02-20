@@ -56,3 +56,32 @@ async def delete_user(
     session.commit()
     
     return {"message": "category deleted successfully!"}  # return a message to the client
+
+@router.patch ("/")
+async def update_user(
+    *,
+    session: Session = Depends(get_session),
+    category: Categories
+):
+    if category.name != Categories.name:
+        raise HTTPException(status_code=404, detail="username not found!")
+    
+    db_category = session.exec(select(Categories).where(category.name == Categories.name)).one()
+    
+    if category.name is None:
+        raise HTTPException(status_code=405, detail="user field required")
+    elif category.name == "string":
+        raise HTTPException(status_code=405, detail="username field required")
+    else:
+        db_category.name = category.name
+    
+    if category.description is not None:
+        db_category.description = category.description
+    
+    if category.created_at is not None:
+        db_category.created_at = category.created_at
+    
+    
+    session.add(db_category)
+    session.commit()
+    return {"massage": "success!"}

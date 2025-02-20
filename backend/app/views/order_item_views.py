@@ -56,3 +56,41 @@ async def delete_user(
     session.commit()
     
     return {"message": "order_item deleted successfully!"}  # return a message to the client
+
+@router.patch ("/")
+async def update_user(
+    *,
+    session: Session = Depends(get_session),
+    order_items: OrderItemsUpdate
+):
+    if order_items.title != OrderItems.title:
+        raise HTTPException(status_code=404, detail="username not found!")
+    
+    db_order_items = session.exec(select(OrderItems).where(order_items.title == OrderItems.title)).one()
+    
+    if order_items.title is None:
+        raise HTTPException(status_code=405, detail="user field required")
+    elif order_items.title == "string":
+        raise HTTPException(status_code=405, detail="username field required")
+    else:
+        db_order_items.title = order_items.title
+    
+    if order_items.description is not None:
+        db_order_items.description = order_items.description
+
+    if order_items.amount is not None:
+        db_order_items.amount = order_items.amount
+        
+    if order_items.total_price is not None:
+        db_order_items.total_price = order_items.total_price
+    
+    if order_items.created_at is not None:
+        db_order_items.created_at = order_items.created_at
+    
+    if order_items.updated_at is not None:
+        db_order_items.updated_at = order_items.updated_at
+    
+    
+    session.add(db_order_items)
+    session.commit()
+    return {"massage": "success!"}

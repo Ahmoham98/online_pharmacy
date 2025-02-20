@@ -44,7 +44,7 @@ async def read_products(
     return db_product
 
 @router.delete("/{product_id}")
-async def delete_user(
+async def delete_product(
     *,
     session: Session = Depends(get_session),
     product_id: int
@@ -56,3 +56,46 @@ async def delete_user(
     session.commit()
     
     return {"message": "product deleted successfully!"}  # return a message to the client
+
+@router.patch ("/")
+async def update_product(
+    *,
+    session: Session = Depends(get_session),
+    product: ProductUpdate
+):
+    if product.title != Products.title:
+        raise HTTPException(status_code=404, detail="username not found!")
+    
+    db_product = session.exec(select(Products).where(product.title == Products.title)).one()
+    if product.title is None:
+        raise HTTPException(status_code=405, detail="title field required")
+    elif product.title == "string":
+        raise HTTPException(status_code=405, detail="title field required")
+    else:
+        db_product.title = product.title
+    
+    if product.description is not None:
+        db_product.description = product.description
+    
+    if product.unit_price is not None:
+        db_product.unit_price = product.unit_price
+    
+    if product.sale_price is not None:
+        db_product.sale_price = product.sale_price
+    
+    if product.is_active is not None:
+        db_product.is_active = product.is_active
+    
+    if product.status is not None:
+        db_product.status = product.status
+    
+    if product.created_at is not None:
+        db_product.created_at = product.created_at
+    
+    if product.updated_at is not None:
+        db_product.updated_at = product.updated_at
+    
+    
+    session.add(db_product)
+    session.commit()
+    return {"massage": "success!"}
