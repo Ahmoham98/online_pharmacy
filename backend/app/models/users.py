@@ -4,7 +4,7 @@ from .orders import Orders
 
 class Users(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    username: str | None = None
+    username: str | None = Field(default=None, index=True)
     password: str | None = None
     email: str | None = None
     phone: int | None = None
@@ -13,6 +13,4 @@ class Users(SQLModel, table=True):
     address: str | None = None
     role: str | None = None
     created_at: str | None = None
-
-    orders: Orders = Relationship(back_populates="users")
 
