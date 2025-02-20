@@ -58,20 +58,20 @@ async def delete_user(
     return {"message": "order_item deleted successfully!"}  # return a message to the client
 
 @router.patch ("/")
-async def update_user(
+async def update_order_items(
     *,
     session: Session = Depends(get_session),
     order_items: OrderItemsUpdate
 ):
     if order_items.title != OrderItems.title:
-        raise HTTPException(status_code=404, detail="username not found!")
+        raise HTTPException(status_code=404, detail="order_item not found!")
     
     db_order_items = session.exec(select(OrderItems).where(order_items.title == OrderItems.title)).one()
     
     if order_items.title is None:
-        raise HTTPException(status_code=405, detail="user field required")
+        raise HTTPException(status_code=405, detail="title field required")
     elif order_items.title == "string":
-        raise HTTPException(status_code=405, detail="username field required")
+        raise HTTPException(status_code=405, detail="title field required")
     else:
         db_order_items.title = order_items.title
     

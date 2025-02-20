@@ -58,13 +58,13 @@ async def delete_user(
     return {"message": "order deleted successfully!"}  # return a message to the client
 
 @router.patch ("/")
-async def update_user(
+async def update_order(
     *,
     session: Session = Depends(get_session),
     order: OrderUpdate
 ):
     if order.card_number != Orders.card_number:
-        raise HTTPException(status_code=404, detail="oder not found!")
+        raise HTTPException(status_code=404, detail="order not found!")
     
     db_order = session.exec(select(Orders).where(order.card_number == Orders.card_number)).one()
 

@@ -64,7 +64,7 @@ async def update_product(
     product: ProductUpdate
 ):
     if product.title != Products.title:
-        raise HTTPException(status_code=404, detail="username not found!")
+        raise HTTPException(status_code=404, detail="product not found!")
     
     db_product = session.exec(select(Products).where(product.title == Products.title)).one()
     if product.title is None:

@@ -69,7 +69,7 @@ async def update_user(
     
     db_user = session.exec(select(Users).where(user.username == Users.username)).one()
     if user.username is None:
-        raise HTTPException(status_code=405, detail="user field required")
+        raise HTTPException(status_code=405, detail="username field required")
     elif user.username == "string":
         raise HTTPException(status_code=405, detail="username field required")
     else:
