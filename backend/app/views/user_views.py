@@ -5,11 +5,13 @@ from ..dependency import get_session
 from ..schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate
 from ..models.users import Users
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],)
 
 
 #Creating get request for /users with a response model of defined User class that we can make python understand it using List from typing builtin python function
-@router.get("/users/", response_model=list[UsersPublic])
+@router.get("/", response_model=list[UsersPublic])
 async def get_users(
     *,
     session: Session = Depends(get_session),
@@ -18,7 +20,7 @@ async def get_users(
         return users
 
 #Creating a post request endpoint to /users
-@router.post("/users/", response_model=UsersPublic)
+@router.post("/", response_model=UsersPublic)
 async def create_user(
     *,
     session: Session = Depends(get_session),
@@ -31,7 +33,7 @@ async def create_user(
     return db_user
 
 #Creating get request endpoint with sending parameters to /users with /users/{id}
-@router.get("/users/{user_id}/")
+@router.get("/{user_id}/")
 async def get_user(
     *,
     session: Session = Depends(get_session),

@@ -6,10 +6,13 @@ from ..dependency import get_session
 from ..models.products import Products
 from ..schema.products_schema import Productsbase, ProductsCreate, ProductsPublic, ProductUpdate
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/products",
+    tags=["products"],
+)
 
 
-@router.post("/products/", response_model=ProductsPublic)
+@router.post("/", response_model=ProductsPublic)
 async def create_products(
     *,
     session: Session = Depends(get_session),
@@ -21,7 +24,7 @@ async def create_products(
     session.refresh(db_product)
     return db_product
 
-@router.get("/products/")
+@router.get("/")
 async def read_products(
     *,
     session: Session = Depends(get_session),
@@ -29,7 +32,7 @@ async def read_products(
     product = session.exec(select(Products)).all()
     return product
 
-@router.get("/products/{product_id}")
+@router.get("/{product_id}")
 async def read_products(
     *,
     session: Session = Depends(get_session),

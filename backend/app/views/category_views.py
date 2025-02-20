@@ -6,10 +6,13 @@ from ..dependency import get_session
 from ..models.categories import Categories
 from ..schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/category",
+    tags=["categories"],
+)
 
 
-@router.post("/category/", response_model=CategoriesPublic)
+@router.post("/", response_model=CategoriesPublic)
 async def create_order(
     *,
     session: Session = Depends(get_session),
@@ -21,7 +24,7 @@ async def create_order(
     session.refresh(db_category_item)
     return db_category_item
 
-@router.get("/category/")
+@router.get("/")
 async def get_orders(
     *,
     session: Session = Depends(get_session),
@@ -29,7 +32,7 @@ async def get_orders(
     db_category_items = session.exec(select(Categories)).all()
     return db_category_items
 
-@router.get("/category/{category_id}")
+@router.get("/{category_id}")
 async def get_order(
     *,
     session: Session = Depends(get_session),

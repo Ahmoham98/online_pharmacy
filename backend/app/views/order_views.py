@@ -6,10 +6,13 @@ from ..dependency import get_session
 from ..models.orders import Orders
 from ..schema.orders_schema import OrderBase, Ordercreate, OrderPublic, OrderUpdate
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/orders",
+    tags=["orders"],
+)
 
 
-@router.post("/orders/", response_model=OrderPublic)
+@router.post("/", response_model=OrderPublic)
 async def create_order(
     *,
     session: Session = Depends(get_session),
@@ -21,7 +24,7 @@ async def create_order(
     session.refresh(db_order)
     return db_order
 
-@router.get("/orders/")
+@router.get("/")
 async def get_orders(
     *,
     session: Session = Depends(get_session),
@@ -29,7 +32,7 @@ async def get_orders(
     orders = session.exec(select(Orders)).all()
     return orders
 
-@router.get("/orders/{order_id}")
+@router.get("/{order_id}")
 async def get_order(
     *,
     session: Session = Depends(get_session),
