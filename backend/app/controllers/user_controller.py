@@ -6,13 +6,11 @@ from ..models.users import Users
 from ..dependency import get_session
 
 # get all of the user
-
 def get_users_controller( session: Session):
     users = session.exec(select(Users)).all()
     return users
 
 # post user
-
 def post_user_controller(session: Session, user: UsersCreate):
     db_user = Users.model_validate(user)
     session.add(db_user)
@@ -21,7 +19,6 @@ def post_user_controller(session: Session, user: UsersCreate):
     return db_user
 
 # get user with id
-
 def get_user_controller(session: Session, user_id: int):
     db_user = session.get(Users, user_id)
     if not db_user:
@@ -29,7 +26,6 @@ def get_user_controller(session: Session, user_id: int):
     return db_user
 
 # delete user with id
-
 def delete_user_controller(session: Session, user_id):
     db_user = session.get(Users, user_id)
     if not db_user:
@@ -40,7 +36,6 @@ def delete_user_controller(session: Session, user_id):
     return {"message": "user deleted successfully!"}  # return a message to the client
 
 # update user with username
-
 def update_user_controller(session: Session, user: UsersUpdate):
     db_user = session.exec(select(Users).where(user.username == Users.username)).one()
     if user.username is None:
