@@ -1,12 +1,12 @@
 from sqlmodel import SQLModel, Field
-
+from pydantic import EmailStr
 # Orders model
 
 class OrderBase(SQLModel):
     total_price: int
     card_number: int
     card_expiration_date: int
-    email: str
+    email: EmailStr
     phone: int
     address: str
     coupon: str
@@ -18,7 +18,7 @@ class OrderBase(SQLModel):
 # Orders Input model
 
 class Ordercreate(OrderBase):
-    email: str | None = None
+    email: EmailStr | None = None
     coupon: str | None = None
     discount: str | None = None
 
@@ -26,7 +26,7 @@ class Ordercreate(OrderBase):
 
 class OrderPublic(OrderBase):
     total_price: int
-    email: str
+    email: EmailStr
     phone: int
     address: str
     status: str
@@ -38,7 +38,7 @@ class OrderUpdate(SQLModel):
     total_price: int | None = None
     card_number: int | None = None
     card_expiration_date: int | None = None
-    email: str | None = None
+    email: EmailStr | None = None
     phone: int | None = None
     address: str | None = None
     coupon: str | None = None

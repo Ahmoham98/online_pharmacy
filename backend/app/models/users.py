@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
+from pydantic import EmailStr
 
 if TYPE_CHECKING:
     from ..models.orders import Orders
@@ -11,7 +12,7 @@ class Users(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str | None = Field(default=None, index=True)
     password: str | None = None
-    email: str | None = None
+    email: EmailStr | None = None
     phone: int | None = None
     first_name: str | None = None
     last_name: str | None = None
