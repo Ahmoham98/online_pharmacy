@@ -1,4 +1,9 @@
-from sqlmodel import SQLModel, Field
+from typing import TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Relationship
+
+if TYPE_CHECKING:
+    from ..models.users import Users
+    from ..models.order_items import OrderItems
 
 # Orders table
     
@@ -12,8 +17,10 @@ class Orders(SQLModel, table=True):
     phone: int | None = None
     address: str | None = None
     coupon: str | None = None
-    discount: int| None = None
+    discount: int | None = None
     status: str| None = None
     created_at: str = Field(default="now")
     updated_at: str = Field(default="now")
 
+    users: "Users" = Relationship(back_populates="orders")
+    order_item: "OrderItems" = Relationship(back_populates="order")

@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
-from .orders import Orders
+
+if TYPE_CHECKING:
+    from ..models.orders import Orders
+    from ..models.products import Products
+
 # Users table
 
 class Users(SQLModel, table=True):
@@ -14,3 +19,5 @@ class Users(SQLModel, table=True):
     role: str | None = None
     created_at: str | None = None
 
+    orders: list["Orders"] = Relationship(back_populates="users")
+    products: list["Products"] = Relationship(back_populates="users")
