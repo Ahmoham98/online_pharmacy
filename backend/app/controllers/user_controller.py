@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException
 from ..schema.users_schema import UsersUpdate, UsersCreate
 from ..models.users import Users
 
-from ..dependency import get_session
+from ..dependency import get_session 
 
 # get all of the user
 def get_users_controller( session: Session):
