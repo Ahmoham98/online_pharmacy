@@ -11,7 +11,7 @@ router = APIRouter(
     prefix="/users",
     tags=["users"],)
 
-
+ 
 #Creating get request for /users with a response model of defined User class that we can make python understand it using List from typing builtin python function
 
 @router.get("/", response_model=list[UsersPublic])
