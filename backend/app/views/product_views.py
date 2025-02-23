@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["products"],
 )
 
-
+ 
 @router.post("/", response_model=ProductsPublic)
 async def create_products(*, session: Session = Depends(get_session), product: ProductsCreate,):
     return post_product_controller(session, product)

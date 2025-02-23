@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["orders"],
 )
 
-
+ 
 @router.post("/", response_model=OrderPublic)
 async def create_order(*, session: Session = Depends(get_session), order: Ordercreate,):
     return post_order_controller(session=session, order=order)

@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["categories"],
 )
 
-
+ 
 @router.post("/", response_model=CategoriesPublic)
 async def create_order(*, session: Session = Depends(get_session), category_item: CategoriesCreate,):
     return post_category_controller(session=session, category_item=category_item)
