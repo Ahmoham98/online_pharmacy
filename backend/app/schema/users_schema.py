@@ -4,7 +4,6 @@ from pydantic import EmailStr
 
 class UsersBase(SQLModel):
     username: str
-    password: str
     email: EmailStr
     phone: int
     first_name: str
@@ -12,6 +11,9 @@ class UsersBase(SQLModel):
     address: str
     role: str
     created_at: str
+
+class UserInDB(UsersBase):
+    hashed_password: str
 
 #User Input model
 
