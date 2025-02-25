@@ -9,28 +9,40 @@ description = """
 ## Users
 You will be able to:
 
-* **Create users** (_not implemented_).
-* **Read users** (_not implemented_).
+* **Create users**
+* **Read users**
+* **update users**
+* **update users**
 
 ## products
 You will be able to:
-* **Create products** (_not implemented_).
-* **Read products** (_not implemented_).
+* **Create products**
+* **Read products**
+* **update products**
+* **delete products**
 
 ## orders
 You will be able to:
-* **Create orders** (_not implemented_).
-* **Read orders** (_not implemented_).
+* **Create orders**
+* **Read orders**
+* **update orders**
+* **delete orders**
+
 
 ## order_items
 You will be able to:
-* **Create order items** (_not implemented_).
-* **read order items** (_not implemented_.)
+* **Create order items**
+* **read order items**
+* **update order items**
+* **delete order items**
+
 
 ## categories
 You will be able to:
-* **Create categories** (_not implemented_).
-* **Read categories** (_not implemented_).
+* **Create categories**
+* **Read categories**
+* **update categories**
+* **delete categories**
 
 """
 tags_metadata = [
