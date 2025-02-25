@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class Users(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str | None = Field(default=None, index=True)
-    password: str | None = None
+    hashed_password: str | None = None
     email: EmailStr | None = None
     phone: int | None = None
     first_name: str | None = None

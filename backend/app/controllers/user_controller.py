@@ -1,9 +1,15 @@
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
+from passlib.context import CryptContext
 from ..schema.users_schema import UsersUpdate, UsersCreate
 from ..models.users import Users
 
 from ..dependency import get_session 
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
 # get all of the user
 def get_users_controller( session: Session):
@@ -12,7 +18,9 @@ def get_users_controller( session: Session):
 
 # post user
 def post_user_controller(session: Session, user: UsersCreate):
-    db_user = Users.model_validate(user)
+    hashed_password = get_password_hash(user.password)
+    extra_data = {"hashed_password": hashed_password}
+    db_user = Users.model_validate(user, update=extra_data)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
