@@ -34,8 +34,8 @@ def get_user_controller(session: Session, username: int):
     return db_user
 
 # delete user with id
-def delete_user_controller(session: Session, user_id):
-    db_user = session.get(Users, user_id)
+def delete_user_controller(session: Session, username):
+    db_user = session.exec(select(Users).where(Users.username == username)).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="user with given id not found! ")
     session.delete(db_user)
