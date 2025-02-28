@@ -18,6 +18,7 @@ class UserInDB(UsersBase):
 #User Input model
 
 class UsersCreate(UsersBase):
+    password: str
     email: EmailStr | None = None
     phone: int | None = None
     address: str | None = None
