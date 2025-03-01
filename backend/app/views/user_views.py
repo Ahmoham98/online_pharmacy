@@ -6,32 +6,21 @@ from sqlmodel import Session, select
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
+from ..database import engine
 from ..dependency import get_session
 from ..schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
 from ..models.users import Users
 
 from ..controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
+import bcrypt
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+SECRET_KEY = "f24bfbb639da735d4ebb1fbf5d442fa9c2269295b6d7a2502b998485e5f92746"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    }
-}
-
 
 class Token(BaseModel):
     access_token: str
@@ -41,39 +30,65 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
 
-
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-
-
-class UserInDB(User):
-    hashed_password: str
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 router = APIRouter()
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+"""get_user_auth
+Args:
+username (str): username to authenticate
 
-def get_user_auth(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+Returns:
+user_in_db: user object from database if authenticated
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user_auth(fake_db, username)
-    if not user:
+Description:
+used to authenticate a user. It takes a username as an argument and returns the user
+"""
+def get_user_auth(
+    username: str,
+):
+    with Session(engine) as session:
+        user_in_db = session.exec(select(Users).where(Users.username == username)).first()
+        if user_in_db:
+            return user_in_db
+        else:
+            raise HTTPException(status_code=400, detail="user with the given username cannot be found in database...")
+
+"""authenticate_user
+Args:
+username (str): username to authenticate
+password (str): password to authenticate
+
+Returns:
+user (User): user object if authentication is successful
+
+Description:
+authenticate user with the given username and password
+"""
+def authenticate_user(username: str, password: str):
+    db_user = get_user_auth(username)
+    if not db_user:
         return False
-    if not verify_password(password, user.hashed_password):
+    # cahnging password and hashed password strign object to pybyte for bcrypt.checkpw usage
+    password = password.encode()
+    hashed_password = db_user.hashed_password.encode()
+    if not bcrypt.checkpw(password, hashed_password):
         return False
-    return user
+    return db_user
 
+"""create_access_token
+Args:
+data (dict): data to be encoded in token // data dict type should be in jwt format for encoding and decoding process
+expires_delta (timedelta): time after which token expires
+
+Returns:
+token (str): access token
+
+Description:
+create access token using pyjwt library
+for pyjwt library:
+    pip install pyjwt
+"""
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
@@ -84,8 +99,18 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+"""get_current_user
+Args:
+token (str): access token
+Returns:
+user (User): user object
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+Description:
+get current user using access token
+"""
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -99,17 +124,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user_auth(fake_users_db, username=token_data.username)
+    user = get_user_auth(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
-
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)],
-):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
 
 
 @router.get("/", response_model=list[UsersPublic])
@@ -137,11 +155,11 @@ async def update_user(*, session: Session = Depends(get_session), user: UsersUpd
     return update_user_controller(session, user)
 
 
-@router.post("/token")
+@router.post("/login")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -155,9 +173,11 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.get("/me", response_model=User)
+@router.get("/me", response_model=UsersPublic)
 async def read_user_me(
-    current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[Users, Depends(get_current_user)]
 ):
     return current_user
+
+
 
