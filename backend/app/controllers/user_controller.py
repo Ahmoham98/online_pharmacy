@@ -3,13 +3,15 @@ from fastapi import Depends, HTTPException
 from passlib.context import CryptContext
 from ..schema.users_schema import UsersUpdate, UsersCreate
 from ..models.users import Users
+import bcrypt
 
-from ..dependency import get_session 
+from ..dependency import get_session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    password = password.encode()
+    return bcrypt.hashpw(password, bcrypt.gensalt())
 
 # get all of the user
 def get_users_controller( session: Session):
