@@ -1,13 +1,11 @@
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
-from passlib.context import CryptContext
 from ..schema.users_schema import UsersUpdate, UsersCreate
 from ..models.users import Users
 import bcrypt
 
 from ..dependency import get_session
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password):
     password = password.encode()
