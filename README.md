@@ -6,3 +6,6 @@
   **-- Framework: Fastapi**
   
   **-- Database: postgresql**
+
+
+* first make sure you install the requirements on you virtual environments
