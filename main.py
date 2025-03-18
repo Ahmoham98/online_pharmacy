@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from sqlmodel import SQLModel
-from .views import user_views, product_views, order_views, order_item_views, category_views
+from views import user_views, product_views, order_views, order_item_views, category_views
 
-from .database import engine
-from .models import users, products, orders, order_items, categories
+import uvicorn
+
+from database import engine
+from models import users, products, orders, order_items, categories
 
 description = """
 ## Users
@@ -102,4 +104,5 @@ def on_startup():
 
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", port=5000, log_level="info")
+    create_db_tables()
