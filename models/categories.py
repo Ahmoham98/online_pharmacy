@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from ..models.products import Products
+    from models.products import Products
 
 # Categories table
 

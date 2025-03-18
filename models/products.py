@@ -2,9 +2,9 @@ from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from ..models.users import Users
-    from ..models.categories import Categories
-    from ..models.order_items import OrderItems
+    from models.users import Users
+    from models.categories import Categories
+    from models.order_items import OrderItems
 
 # Products table
 

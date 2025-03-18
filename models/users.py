@@ -3,8 +3,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from pydantic import EmailStr
 
 if TYPE_CHECKING:
-    from ..models.orders import Orders
-    from ..models.products import Products
+    from models.orders import Orders
+    from models.products import Products
 
 # Users table
 

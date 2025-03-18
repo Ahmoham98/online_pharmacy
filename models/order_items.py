@@ -3,8 +3,8 @@ from sqlmodel import SQLModel, Field, Relationship
 
 
 if TYPE_CHECKING:
-    from ..models.products import Products
-    from ..models.orders import Orders
+    from models.products import Products
+    from models.orders import Orders
 
 # Order_items table
 
