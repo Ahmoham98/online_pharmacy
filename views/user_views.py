@@ -5,15 +5,14 @@ import jwt
 from sqlmodel import Session, select
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
 from pydantic import BaseModel
 
-from ..database import engine
-from ..dependency import get_session
-from ..schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
-from ..models.users import Users
+from database import engine
+from dependency import get_session
+from schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
+from models.users import Users
 
-from ..controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
+from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
 import bcrypt
 
 # to get a string like this run:
@@ -122,7 +121,7 @@ async def get_current_user(
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except InvalidTokenError:
+    except jwt.InvalidTokenError:
         raise credentials_exception
     user = get_user_auth(username=token_data.username)
     if user is None:

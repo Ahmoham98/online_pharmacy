@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from ..dependency import get_session
+from dependency import get_session
 
-from ..models.products import Products
-from ..schema.products_schema import Productsbase, ProductsCreate, ProductsPublic, ProductUpdate
+from models.products import Products
+from schema.products_schema import Productsbase, ProductsCreate, ProductsPublic, ProductUpdate
 
-from ..controllers.product_controller import post_product_controller, get_products_controller, get_product_controller, delete_product_controller, update_product_controller
+from controllers.product_controller import post_product_controller, get_products_controller, get_product_controller, delete_product_controller, update_product_controller
 
 router = APIRouter(
     prefix="/products",

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from ..dependency import get_session
+from  dependency import get_session
 
-from ..models.orders import Orders
-from ..schema.orders_schema import OrderBase, Ordercreate, OrderPublic, OrderUpdate
+from models.orders import Orders
+from schema.orders_schema import OrderBase, Ordercreate, OrderPublic, OrderUpdate
 
-from ..controllers.order_controller import post_order_controller, get_orders_controller, get_order_controller, delete_order_controller, update_order_controller
+from controllers.order_controller import post_order_controller, get_orders_controller, get_order_controller, delete_order_controller, update_order_controller
 
 router = APIRouter(
     prefix="/orders",

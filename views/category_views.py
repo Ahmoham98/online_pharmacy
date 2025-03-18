@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from ..dependency import get_session
+from dependency import get_session
 
-from ..models.categories import Categories
-from ..schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
+from models.categories import Categories
+from schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
 
-from ..controllers.category_controller import post_category_controller, get_categories_controller, get_category_controller, delete_category_cotroller, update_category_controller
+from controllers.category_controller import post_category_controller, get_categories_controller, get_category_controller, delete_category_cotroller, update_category_controller
 
 router = APIRouter(
     prefix="/category",
