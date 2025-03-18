@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
 
-from ..models.products import Products
-from ..schema.products_schema import ProductsCreate, ProductUpdate
+from models.products import Products
+from schema.products_schema import ProductsCreate, ProductUpdate
 
 
 # post product

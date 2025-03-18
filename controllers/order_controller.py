@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
 
-from ..models.orders import Orders
-from ..schema.orders_schema import Ordercreate, OrderUpdate
+from models.orders import Orders
+from schema.orders_schema import Ordercreate, OrderUpdate
 
 #post order
 def post_order_controller(session: Session, order:Ordercreate):

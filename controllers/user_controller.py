@@ -1,10 +1,10 @@
 from sqlmodel import Session, select
 from fastapi import Depends, HTTPException
-from ..schema.users_schema import UsersUpdate, UsersCreate
-from ..models.users import Users
+from schema.users_schema import UsersUpdate, UsersCreate
+from models.users import Users
 import bcrypt
 
-from ..dependency import get_session
+from dependency import get_session
 
 
 def get_password_hash(password): 

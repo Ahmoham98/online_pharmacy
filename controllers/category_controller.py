@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 from fastapi import HTTPException
 
-from ..models.categories import Categories
-from ..schema.categories_schema import CategoriesCreate, CategoriesUpdate
+from models.categories import Categories
+from schema.categories_schema import CategoriesCreate, CategoriesUpdate
 
 
 #post category
