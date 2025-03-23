@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 from views import user_views, product_views, order_views, order_item_views, category_views
 
@@ -84,6 +85,22 @@ app = FastAPI(
     summary="Online Pharmacy: save time by getting requirements online...",
     version="0.0.7",
     openapi_tags=tags_metadata
+)
+
+origins = [
+    "http://localhost:8000",
+    "http://localhost:80",
+    "http://localhost",
+    "htttp://localhost:8080",
+    "http://localhost/user",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 app.include_router(user_views.router)
