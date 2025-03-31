@@ -6,6 +6,7 @@ from sqlmodel import Session, select
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import engine
 from dependency import get_session
@@ -14,6 +15,48 @@ from models.users import Users
 
 from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
 import bcrypt
+
+import json
+from functools import wraps
+import redis
+# Why asynchronous redis connection is not working when i try using aiocache even with having the aiocache library installed 
+from aiocache import Cache
+from fastapi import HTTPException
+
+def cache_response(ttl: int = 60, namespace: str = "main"):
+    """caching decorator for fastapi endpoints
+
+    Args:
+        ttl (int, optional): Time to live for the cache in seconds. Defaults to 60.
+        namespace (str, optional): Namespace for cache key in Redis. Defaults to "main".
+    """
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            username = kwargs.get('username') or args[0]  #I am assuming the user_id is the first argument
+            cache_key = f"{namespace}:user:{username}"
+            
+            cache = redis.Redis(endpoint='localhost', port=6379, namespace=namespace)
+            
+            #Try to retrieve data from cache
+            cached_value = await cache.get(cache_key)
+            if cached_value :
+                return json.loads(cached_value)
+            
+            #Call the actual function if cache is not hit\
+            response = await func(*args, **kwargs)
+            
+            try:
+                #Store the response in redis with a ttl
+                await cache.set(cache_key, json.dumps(response), ttl=ttl)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error caching data: {e}")
+            
+            return response
+        return wrapper
+    return decorator
+
+
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -130,20 +173,28 @@ async def get_current_user(
 
 
 @router.get("/", response_model=list[UsersPublic])
-async def get_users(*, session: Session = Depends(get_session)):
-        return get_users_controller(session)
+async def get_users(*, session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Users))
+    return result.scalars().all()
+    #return await get_users_controller(session)
 
 #Creating a post request endpoint to /users
 
 @router.post("/", response_model=UsersPublic)
 async def create_user(*, session: Session = Depends(get_session), user : UsersCreate):
-    return post_user_controller(session, user)
+    session.add(Users)
+    session.commit()
+    return
+    #return post_user_controller(session, user)
 
 #Creating get request endpoint with sending parameters to /users with /users/{id}
 
-@router.get("/{usename}/")
+@router.get("/{username}/")
+@cache_response(ttl=120, namespace="users")
 async def get_user(*, session: Session = Depends(get_session), username: str):
-    return get_user_controller(session, username)
+    db_user = await session.execute(select(Users).where(Users.username == username))
+    return db_user.scalars().first()
+    #return get_user_controller(session, username)
 
 @router.delete("/{username}")
 async def delete_user(*, session: Session = Depends(get_session), username: str):
