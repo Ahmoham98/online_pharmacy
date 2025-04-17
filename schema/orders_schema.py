@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from pydantic import EmailStr
-# Orders model
 
+# Orders model
 class OrderBase(SQLModel):
     total_price: int
     card_number: int
@@ -16,14 +16,12 @@ class OrderBase(SQLModel):
     updated_at: str = Field(default="now")
 
 # Orders Input model
-
 class Ordercreate(OrderBase):
     email: EmailStr | None = None
     coupon: str | None = None
     discount: str | None = None
 
 # Orders Output model
-
 class OrderPublic(OrderBase):
     total_price: int
     email: EmailStr
@@ -33,7 +31,6 @@ class OrderPublic(OrderBase):
     created_at: str = Field(default="now")
 
 # Orders Update(Patch) model
-
 class OrderUpdate(SQLModel):
     total_price: int | None = None
     card_number: int | None = None
