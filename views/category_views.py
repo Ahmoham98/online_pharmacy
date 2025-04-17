@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from dependency import get_session
+
+from database import get_session
 
 from models.categories import Categories
 from schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
@@ -13,25 +15,61 @@ router = APIRouter(
     tags=["categories"],
 )
 
- 
+
 @router.post("/", response_model=CategoriesPublic)
-async def create_order(*, session: Session = Depends(get_session), category_item: CategoriesCreate,):
-    return post_category_controller(session=session, category_item=category_item)
+async def create_order(*, session: AsyncSession = Depends(get_session), category_item: CategoriesCreate,):
+    """db_category = Categories.model_validate(category_item)
+    session.add(db_category)
+    await session.commit()
+    return {"message": "category added succesfully! "}"""
+    return await post_category_controller(session=session, category_item=category_item)
 
-@router.get("/")
-async def get_orders(*, session: Session = Depends(get_session),):
-    return get_categories_controller(session=session)
+@router.get("/")            # need to be fixed
+async def get_orders(*, session: AsyncSession = Depends(get_session),):
+    """db_categories = await session.execute(select(Categories)).scalars().all()
+    return db_categories"""
+    return await get_categories_controller(session=session)
 
-@router.get("/{category_id}")
-async def get_order(*, session: Session = Depends(get_session), category_id: int,):
-    return get_category_controller(session=session, category_id=category_id)
+@router.get("/{category_name}")
+async def get_order(*, session: AsyncSession = Depends(get_session), name: str,):
+    """db_category_item = await session.execute(select(Categories).where(Categories.name == name))
+    if not db_category_item:
+        raise HTTPException(status_code=406, detail="categoriy with the given name has not found! ")
+    db_category_item = db_category_item.scalar()
+    return db_category_item"""
+    return await get_category_controller(session=session, name=name)
 
 @router.delete("/{category_id}")
-async def delete_user(*, session: Session = Depends(get_session), category_id: int):
-    return delete_category_cotroller(session=session, category_id=category_id)
+async def delete_user(*, session: AsyncSession = Depends(get_session), name: str):
+    """db_category = await session.execute(select(Categories).where(Categories.name == name))
+    db_category = db_category.scalars().first()
+    if not db_category:
+        raise HTTPException(status_code=404, detail="user with given username not found!")
+    await session.delete(db_category)
+    await session.commit()
+    return {"message": "user have been deleted succesfully!"}"""
+    return await delete_category_cotroller(session=session, name=name)
 
 @router.patch ("/")
-async def update_category(*, session: Session = Depends(get_session), category: CategoriesUpdate):
-    return update_category_controller(session=session, category=category)
+async def update_category(*, session: AsyncSession = Depends(get_session), category: CategoriesUpdate):
+    db_category = await session.execute(select(Categories).where(category.name == Categories.name))
+    db_category = db_category.scalar()
+    if category.name is None:
+        raise HTTPException(status_code=405, detail="name field required")
+    elif category.name == "string":
+        raise HTTPException(status_code=405, detail="name field required")
+    else:
+        db_category.name = category.name
+    
+    if category.description is not None:
+        db_category.description = category.description
+    
+    if category.created_at is not None:
+        db_category.created_at = category.created_at
+    
+    session.add(db_category)
+    await session.commit()
+    return {"massage": "success!"}
+    #return update_category_controller(session=session, category=category)
 
 

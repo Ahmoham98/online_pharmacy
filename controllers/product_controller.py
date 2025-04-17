@@ -1,4 +1,5 @@
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from fastapi import HTTPException
 
 from models.products import Products
@@ -6,37 +7,43 @@ from schema.products_schema import ProductsCreate, ProductUpdate
 
 
 # post product
-def post_product_controller(session: Session, product: ProductsCreate):
+async def post_product_controller(session: AsyncSession, product: ProductsCreate):
     db_product = Products.model_validate(product)
     session.add(db_product)
-    session.commit()
-    session.refresh(db_product)
+    await session.commit()
+    await session.refresh(db_product)
     return db_product
 
 # get all products
-def get_products_controller(session: Session):
-    product = session.exec(select(Products)).all()
+async def get_products_controller(session: AsyncSession):
+    statement = select(Products)
+    product = await session.exec(statement)
+    product = product.all()
     return product
 
 #get products by id
-def get_product_controller(session: Session, product_id: int):
-    db_product = session.get(Products, product_id)
-    if not db_product:
+async def get_product_controller(session: AsyncSession, title: str):
+    statement = select(Products).where(Products.title == title)
+    result = await session.exec(statement)
+    result = result.first()
+    if not result:
         raise HTTPException(status_code=404, detail="product with the given id not found! ")
-    return db_product
+    return result
 
 #delete products by id
-def delete_product_controller(session: Session, product_id):
-    db_product = session.get(Products, product_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail="product with given id not found! ")
-    session.delete(db_product)
-    session.commit()
+async def delete_product_controller(session: AsyncSession, title: str):
+    statement = select(Products).where(Products.title == title)
+    result = await session.exec(statement)
+    result = result.first()
+    if not result:
+        raise HTTPException(status_code=404, detail="product with given title not found! ")
+    await session.delete(result)
+    await session.commit()
     
     return {"message": "product deleted successfully!"}  # return a message to the clientl
 
 #update product using title
-def update_product_controller(session: Session, product: ProductUpdate):
+def update_product_controller(session: AsyncSession, product: ProductUpdate):
     db_product = session.exec(select(Products).where(product.title == Products.title)).one()
     if product.title is None:
         raise HTTPException(status_code=405, detail="title field required")

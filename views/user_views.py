@@ -6,23 +6,27 @@ from sqlmodel import Session, select
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from database import engine
-from dependency import get_session
+from dependency import engine
+from database import async_engine
+from database import get_session
 from schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
 from models.users import Users
 
-from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
+#from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
 import bcrypt
 
 import json
 from functools import wraps
 import redis
-# Why asynchronous redis connection is not working when i try using aiocache even with having the aiocache library installed 
-from aiocache import Cache
+# asynchronous redis connection is not working when try using aiocache even with having the aiocache library installed 
+# check for the requirements...
+#from aiocache import Cache
 from fastapi import HTTPException
 
+
+# cache response decorator
 def cache_response(ttl: int = 60, namespace: str = "main"):
     """caching decorator for fastapi endpoints
 
@@ -57,8 +61,6 @@ def cache_response(ttl: int = 60, namespace: str = "main"):
     return decorator
 
 
-
-# to get a string like this run:
 # openssl rand -hex 32
 SECRET_KEY = "f24bfbb639da735d4ebb1fbf5d442fa9c2269295b6d7a2502b998485e5f92746"
 ALGORITHM = "HS256"
@@ -86,7 +88,7 @@ user_in_db: user object from database if authenticated
 Description:
 used to authenticate a user. It takes a username as an argument and returns the user
 """
-def get_user_auth(
+def get_user_auth(              # The session connection need to changed to asyncsession
     username: str,
 ):
     with Session(engine) as session:
@@ -171,39 +173,117 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-
+from controllers.user_controller import UserController
 @router.get("/", response_model=list[UsersPublic])
 async def get_users(*, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Users))
-    return result.scalars().all()
+    """ 
+        Handles get_all user requests and hand it over to the backend to get all the users 
+    """
     #return await get_users_controller(session)
+    result = await UserController(session=session).get_users_controller()
+    return result
 
 #Creating a post request endpoint to /users
-
 @router.post("/", response_model=UsersPublic)
-async def create_user(*, session: Session = Depends(get_session), user : UsersCreate):
-    session.add(Users)
-    session.commit()
-    return
-    #return post_user_controller(session, user)
+async def create_user(*, session: AsyncSession = Depends(get_session), user : UsersCreate):
+    """db_user = Users.model_validate(user)
+    session.add(db_user)
+    await session.commit() 
+    return {"message": "user created successfully!"} """ # return a message to the client
+    #return await post_user_controller(session, user)
+    result = await UserController(session=session).post_user_controller(user=user)
+    return result
 
-#Creating get request endpoint with sending parameters to /users with /users/{id}
-
+#Creating get request endpoint with sending parameters to /users with /users/{id}  done *_*
+# was working by adding redis decoration, some error from redis.__init__ happen, need to be check...
 @router.get("/{username}/")
-@cache_response(ttl=120, namespace="users")
-async def get_user(*, session: Session = Depends(get_session), username: str):
-    db_user = await session.execute(select(Users).where(Users.username == username))
-    return db_user.scalars().first()
-    #return get_user_controller(session, username)
+#@cache_response(ttl=120, namespace="users")
+async def get_user(*, session: AsyncSession = Depends(get_session), username: str):
+    """ 
+        Handles get user requests with the given username and hand it over to the backend to get the user with the given username
+    """
+    #statement = select(Users).where(Users.username == username)
+    #result = await session.exec(statement)
+    #return result.first()
+    
+    
+    #return await get_user_controller(session, username)
+    
+    result = await UserController(session=session).get_user_controller(username=username)
+    return result
 
 @router.delete("/{username}")
-async def delete_user(*, session: Session = Depends(get_session), username: str):
-    return delete_user_controller(session, username )
+async def delete_user(*, session: AsyncSession = Depends(get_session), username: str):
+    """
+        Handles delete requests and hand it over to the backend to manage delete operation
+    """
+    #statement = select(Users).where(Users.username == username)
+    #result = await session.exec(statement=statement)
+    #result = result.first()
+    #if not result:
+    #    raise HTTPException(status_code=404, detail="user with given username not found!")
+    #await session.delete(result)
+    #await session.commit()
+    #return {"message": "user have been deleted succesfully!"}"""
+    
+    
+    #return await delete_user_controller(session, username )
+    
+    result = await UserController(session=session).delete_user_controller(username=username)
+    return result
 
 @router.patch ("/")
-async def update_user(*, session: Session = Depends(get_session), user: UsersUpdate):
-    return update_user_controller(session, user)
-
+async def update_user(*, session: AsyncSession = Depends(get_session), user: UsersUpdate):
+    """
+        Handles partial update and send it over to the backend to manage the update oparation
+    """
+    """db_user = await session.execute(select(Users).where(user.username == Users.username))
+    db_user = db_user.scalar()
+    if user.username is None:
+        raise HTTPException(status_code=405, detail="username field required")
+    elif user.username == "string":
+        raise HTTPException(status_code=405, detail="username field required")
+    else:
+        db_user.username = user.username
+    
+    #troubleshooting
+    print(f"db_user username is {db_user.username}")
+    print(f"db_user email address is {db_user.email}")
+    print(f"db_user address is {db_user.address}")
+    print(f"user input address is {user.address}")
+    
+    if user.password is not None:
+        db_user.password = user.password
+        
+    if user.email is not None:
+        db_user.email = user.email
+    
+    if user.phone is not None:
+        db_user.phone = db_user.phone
+    
+    if user.first_name is not None:
+        db_user.first_name = user.first_name
+    
+    if user.last_name is not None:
+        db_user.last_name = user.last_name
+    
+    if user.address is not None:
+        print ("address filed is not none ")
+        db_user.address = user.address
+    
+    if user.role is not None:
+        db_user.role = user.role
+    
+    if user.created_at is not None:
+        db_user.created_at = user.created_at
+    print (f"db_user is {db_user}")
+    session.add(db_user)
+    await session.commit()
+    return {"massage": "success!"}"""
+    #return await update_user_controller(session, user)
+    
+    result = await UserController(session=session).update_user_controller(user=user)
+    return result
 
 @router.post("/login")
 async def login_for_access_token(

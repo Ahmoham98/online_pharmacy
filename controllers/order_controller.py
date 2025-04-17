@@ -1,11 +1,12 @@
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from fastapi import HTTPException
 
 from models.orders import Orders
 from schema.orders_schema import Ordercreate, OrderUpdate
 
 #post order
-def post_order_controller(session: Session, order:Ordercreate):
+def post_order_controller(session: AsyncSession, order:Ordercreate):
     db_order = Orders.model_validate(order)
     session.add(db_order)
     session.commit()
@@ -13,19 +14,19 @@ def post_order_controller(session: Session, order:Ordercreate):
     return db_order
 
 #get all orders
-def get_orders_controller(session: Session):
+def get_orders_controller(session: AsyncSession):
     orders = session.exec(select(Orders)).all()
     return orders
 
 #get order by id
-def get_order_controller(session: Session, order_id: int):
+def get_order_controller(session: AsyncSession, order_id: int):
     db_order = session.get(Orders, order_id)
     if not db_order:
         raise HTTPException(status_code=404, detail="order with given id is not found! ")
     return db_order
 
 #delete order by id
-def delete_order_controller(session: Session, order_id: int):
+def delete_order_controller(session: AsyncSession, order_id: int):
     db_order = session.get(Orders, order_id)
     if not db_order:
         raise HTTPException(status_code=404, detail="order with given id not found! ")
@@ -35,7 +36,7 @@ def delete_order_controller(session: Session, order_id: int):
     return {"message": "order deleted successfully!"}  # return a message to the client
 
 #update order with cardnumber
-def update_order_controller(session: Session, order: OrderUpdate):
+def update_order_controller(session: AsyncSession, order: OrderUpdate):
     db_order = session.exec(select(Orders).where(order.card_number == Orders.card_number)).one()
 
     if order.total_price is None:
