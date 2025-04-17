@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from pydantic import EmailStr
-# Users model
 
+# Users model
 class UsersBase(SQLModel):
     username: str
     email: EmailStr
@@ -12,11 +12,11 @@ class UsersBase(SQLModel):
     role: str
     created_at: str
 
+# User password with hashed data
 class UserInDB(UsersBase):
     hashed_password: str
 
 #User Input model
-
 class UsersCreate(UsersBase):
     password: str
     email: EmailStr | None = None
@@ -25,14 +25,12 @@ class UsersCreate(UsersBase):
     created_at: str = Field(default="now")
 
 # User Output model
-
 class UsersPublic(UsersBase):
     id: int
     email: EmailStr | None = None
     phone: int | None = None
 
 # User Update(Patch) model
-
 class UsersUpdate(SQLModel):
     username: str 
     password: str | None = None
