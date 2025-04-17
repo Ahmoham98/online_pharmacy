@@ -14,11 +14,10 @@ class Productsbase(SQLModel):
     updated_at: str = Field(default="now")
 
 # Product input model
-
 class ProductsCreate(Productsbase):
     pass
-# Products Output model
 
+# Products Output model
 class ProductsPublic(Productsbase):
     id: int
     category_id: int
@@ -26,7 +25,6 @@ class ProductsPublic(Productsbase):
 
 
 #Products Update(Patch) model
-
 class ProductUpdate(SQLModel):
     title: str | None = None
     description: str | None = None
