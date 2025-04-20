@@ -9,3 +9,74 @@
 
 
 * first make sure you install the requirements on you virtual environments
+
+
+
+
+
+
+
+////////////////////////////////////////////////// level one consideration level ///////////////////////////////////////////////////////////
+for configuring database using pydantic settings for using .env parameters and avoid hardcoding the password by passing it in connection url:
+    define the problem:
+        Pydantic_settings library doe's not recognized even it have been installed using pip package manager
+            ==> Although the code is actually set
+
+////////////////////////////////////////////////// level one consideration level ///////////////////////////////////////////////////////////
+username and password Authentication code stop working after changing the database connection engine and session into Asynchronous
+    functions for Authentication are as follows:
+
+        1.login_for_access_token() ==> 3.Authenticate_user() ==> 6.create_access_token()
+                                       ...  4.get_user_auth()
+                                       ...  5.checkpswd()
+        
+        2.read_user_me() ==> 3.get_current_user() ==> 4.get_user_auth()
+
+
+        Authenticate_user(): Unit testing: passed, integration testing: failed
+        get_user_auth(): Unit testing: passed, integration testing: failed
+        checkpswd(): Unit testing: passed, integration testing: failed
+        create_access_token(): Unit testing: passed, integration testing: failed
+        read_user_me(): Unit testing: passed, integration testing: failed
+        get_current_user(): Unit testing: passed, integration testing: failed
+        get_user_auth(): Unit testing: passed, integration testing: failed
+
+
+
+////////////////////////////////////////////////// level one consideration level ///////////////////////////////////////////////////////////
+CORS for managing resource using roigin headers,
+and passing origin headers form every created api has been faced issue after changing database connection from 
+synchronous to Asynchronous.
+
+    Implementation it may need:
+        1.settings origin header for seding them as parameters,
+        2.middleware is ready already and has been written,
+        3.source access should be checked twice
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////// level two consideration level ///////////////////////////////////////////////////////////
+migration have some misconfiguration that need to be fixed:
+    no connection to the database connection engine and session changing
+    
+    Implementation it may need during fixing:
+        1.checking paratemers
+        2.set require configuration among the missing ones
+
+
+
