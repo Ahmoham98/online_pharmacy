@@ -16,6 +16,16 @@ username and password Authentication code stop working after changing the databa
         2.read_user_me() ==> 3.get_current_user() ==> 4.get_user_auth()
 
 
+        Authenticate_user(): Unit testing: passed, integration testing: failed
+        get_user_auth(): Unit testing: passed, integration testing: failed
+        checkpswd(): Unit testing: passed, integration testing: failed
+        create_access_token(): Unit testing: passed, integration testing: failed
+        read_user_me(): Unit testing: passed, integration testing: failed
+        get_current_user(): Unit testing: passed, integration testing: failed
+        get_user_auth(): Unit testing: passed, integration testing: failed
+
+
+
 ////////////////////////////////////////////////// level one consideration level ///////////////////////////////////////////////////////////
 CORS for managing resource using roigin headers,
 and passing origin headers form every created api has been faced issue after changing database connection from 
