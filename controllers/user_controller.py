@@ -1,11 +1,11 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from schema.users_schema import UsersUpdate, UsersCreate
 from models.users import Users
 import bcrypt
 
-from database import get_session
+
 
 #Password hasher
 async def get_password_hash(password):
@@ -40,7 +40,7 @@ class UserController:
         extra_data = {"hashed_password": hashed_password}
         db_user = Users.model_validate(user, update=extra_data)
         self.session.add(db_user)
-        await self.session.commit()
+        await self.session.commit() 
         await self.session.refresh(db_user)
         return db_user
     
