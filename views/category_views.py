@@ -23,13 +23,13 @@ async def create_order(*, session: AsyncSession = Depends(get_session), category
     session.add(db_category)
     await session.commit()
     return {"message": "category added succesfully! "}"""
-    return await CategoryController(session=session).post_category_controller(session=session, category_item=category_item)
+    return await CategoryController(session=session).post_category_controller(category_item=category_item)
  
 @router.get("/")            # need to be fixed
 async def get_orders(*, session: AsyncSession = Depends(get_session),):
     """db_categories = await session.execute(select(Categories)).scalars().all()
     return db_categories"""
-    return await CategoryController(session=session).get_categories_controller(session=session)
+    return await CategoryController(session=session).get_categories_controller()
 
 @router.get("/{category_name}")
 async def get_order(*, session: AsyncSession = Depends(get_session), name: str,):
@@ -38,7 +38,7 @@ async def get_order(*, session: AsyncSession = Depends(get_session), name: str,)
         raise HTTPException(status_code=406, detail="categoriy with the given name has not found! ")
     db_category_item = db_category_item.scalar()
     return db_category_item"""
-    return await CategoryController(session=session).get_category_controller(session=session, name=name)
+    return await CategoryController(session=session).get_category_controller(name=name)
 
 @router.delete("/{category_id}")
 async def delete_user(*, session: AsyncSession = Depends(get_session), name: str):
@@ -49,7 +49,7 @@ async def delete_user(*, session: AsyncSession = Depends(get_session), name: str
     await session.delete(db_category)
     await session.commit()
     return {"message": "user have been deleted succesfully!"}"""
-    return await CategoryController(session=session).delete_category_cotroller(session=session, name=name)
+    return await CategoryController(session=session).delete_category_cotroller(name=name)
 
 @router.patch ("/")
 async def update_category(*, session: AsyncSession = Depends(get_session), category: CategoriesUpdate):
@@ -71,6 +71,6 @@ async def update_category(*, session: AsyncSession = Depends(get_session), categ
     session.add(db_category)
     await session.commit()
     return {"massage": "success!"}"""
-    return await CategoryController(session=session).update_category_controller(session=session, category=category)
+    return await CategoryController(session=session).update_category_controller(category=category)
 
 
