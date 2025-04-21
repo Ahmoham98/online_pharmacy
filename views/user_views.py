@@ -71,7 +71,9 @@ def cache_response(ttl: int = 60, namespace: str = "main"):
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users"
+)
 
 
 @router.get("/", response_model=list[UsersPublic])
