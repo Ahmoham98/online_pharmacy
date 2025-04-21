@@ -21,20 +21,20 @@ async def create_order(*, session: AsyncSession = Depends(get_session), order: O
     session.add(db_order)
     await session.commit()
     return {"message": "user created successfully!"}"""
-    return await OrderController(session=session).post_order_controller(session=session, order=order)
+    return await OrderController(session=session).post_order_controller(order=order)
 
 @router.get("/")    # need to be fixed
 async def get_orders(*, session: AsyncSession = Depends(get_session),):
     """result = await session.execute(select(Orders))
     result = result.scalars().all()
     return result"""
-    return await OrderController(session=session).get_orders_controller(session=session)
+    return await OrderController(session=session).get_orders_controller()
 
 @router.get("/{order_id}")
 async def get_order(*, session: AsyncSession = Depends(get_session), order_id: int,):
     """db_order = await session.exec(select(Orders).where(Orders.id == order_id))
     return db_order.first()"""
-    return await OrderController(session=session).get_order_controller(session=session, order_id=order_id)
+    return await OrderController(session=session).get_order_controller(order_id=order_id)
 
 @router.delete("/{order_id}")
 async def delete_user(*, session: AsyncSession = Depends(get_session), order_id: int):
@@ -45,7 +45,7 @@ async def delete_user(*, session: AsyncSession = Depends(get_session), order_id:
     await session.delete(db_order)
     await session.commit()
     return {"message": "user have been deleted succesfully!"}"""
-    return await OrderController(session=session).delete_order_controller(session=session, order_id=order_id)
+    return await OrderController(session=session).delete_order_controller(order_id=order_id)
 
 @router.patch ("/")
 async def update_order(*,session: AsyncSession = Depends(get_session), order: OrderUpdate):
@@ -88,4 +88,4 @@ async def update_order(*,session: AsyncSession = Depends(get_session), order: Or
     session.add(db_order)
     await session.commit()
     return {"massage": "success!"}"""
-    return await OrderController(session=session).update_order_controller(session=session, order=order)
+    return await OrderController(session=session).update_order_controller(order=order)
