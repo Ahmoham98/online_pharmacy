@@ -17,20 +17,20 @@ router = APIRouter(
 
 @router.post("/", response_model=OrderItemsPublic)
 async def create_order(*, session: AsyncSession = Depends(get_session), order_item: OrderItemsCreate,):
-    return await OrderItemsController(session=session).post_order_items_controller(session=session, order_item=order_item)
+    return await OrderItemsController(session=session).post_order_items_controller(order_item=order_item)
 
 @router.get("/")
 async def get_orders(*, session: AsyncSession = Depends(get_session),):
-    return await OrderItemsController(session=session).get_order_items_controller(session=session)
+    return await OrderItemsController(session=session).get_order_items_controller()
 
 @router.get("/{orderitems_id}")
 async def get_order(*, session: AsyncSession = Depends(get_session), order_item_id: int,):
-    return await OrderItemsController(session=session).get_order_item_controller(session=session, order_item_id=order_item_id)
+    return await OrderItemsController(session=session).get_order_item_controller(order_item_id=order_item_id)
 
 @router.delete("/{orderitem_id}")
 async def delete_user(*, session: AsyncSession = Depends(get_session), order_item_id: int):
-    return await OrderItemsController(session=session).delete_order_item_controller(session=session, order_item_id=order_item_id)
+    return await OrderItemsController(session=session).delete_order_item_controller(order_item_id=order_item_id)
 
 @router.patch ("/")
 async def update_order_items(*, session: AsyncSession = Depends(get_session), order_items: OrderItemsUpdate):
-    return await OrderItemsController(session=session).update_order_item_controller(session=session, order_items=order_items)
+    return await OrderItemsController(session=session).update_order_item_controller(order_items=order_items)
