@@ -8,7 +8,8 @@ from database import get_session
 from models.categories import Categories
 from schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
 
-from controllers.category_controller import post_category_controller, get_categories_controller, get_category_controller, delete_category_cotroller, update_category_controller
+from controllers.category_controller import CategoryController
+#from controllers.category_controller import post_category_controller, get_categories_controller, get_category_controller, delete_category_cotroller, update_category_controller
 
 router = APIRouter(
     prefix="/category",
@@ -22,13 +23,13 @@ async def create_order(*, session: AsyncSession = Depends(get_session), category
     session.add(db_category)
     await session.commit()
     return {"message": "category added succesfully! "}"""
-    return await post_category_controller(session=session, category_item=category_item)
-
+    return await CategoryController(session=session).post_category_controller(session=session, category_item=category_item)
+ 
 @router.get("/")            # need to be fixed
 async def get_orders(*, session: AsyncSession = Depends(get_session),):
     """db_categories = await session.execute(select(Categories)).scalars().all()
     return db_categories"""
-    return await get_categories_controller(session=session)
+    return await CategoryController(session=session).get_categories_controller(session=session)
 
 @router.get("/{category_name}")
 async def get_order(*, session: AsyncSession = Depends(get_session), name: str,):
@@ -37,7 +38,7 @@ async def get_order(*, session: AsyncSession = Depends(get_session), name: str,)
         raise HTTPException(status_code=406, detail="categoriy with the given name has not found! ")
     db_category_item = db_category_item.scalar()
     return db_category_item"""
-    return await get_category_controller(session=session, name=name)
+    return await CategoryController(session=session).get_category_controller(session=session, name=name)
 
 @router.delete("/{category_id}")
 async def delete_user(*, session: AsyncSession = Depends(get_session), name: str):
@@ -48,11 +49,11 @@ async def delete_user(*, session: AsyncSession = Depends(get_session), name: str
     await session.delete(db_category)
     await session.commit()
     return {"message": "user have been deleted succesfully!"}"""
-    return await delete_category_cotroller(session=session, name=name)
+    return await CategoryController(session=session).delete_category_cotroller(session=session, name=name)
 
 @router.patch ("/")
 async def update_category(*, session: AsyncSession = Depends(get_session), category: CategoriesUpdate):
-    db_category = await session.execute(select(Categories).where(category.name == Categories.name))
+    """db_category = await session.execute(select(Categories).where(category.name == Categories.name))
     db_category = db_category.scalar()
     if category.name is None:
         raise HTTPException(status_code=405, detail="name field required")
@@ -69,7 +70,7 @@ async def update_category(*, session: AsyncSession = Depends(get_session), categ
     
     session.add(db_category)
     await session.commit()
-    return {"massage": "success!"}
-    #return update_category_controller(session=session, category=category)
+    return {"massage": "success!"}"""
+    return await CategoryController(session=session).update_category_controller(session=session, category=category)
 
 
