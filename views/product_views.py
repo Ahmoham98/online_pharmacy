@@ -16,27 +16,27 @@ router = APIRouter(
 )
 
  
-@router.post("/", response_model=ProductsPublic)
+@router.post("/", response_model=ProductsPublic, deprecated=True)
 async def create_products(*, session: AsyncSession = Depends(get_session), product: ProductsCreate,):
     """db_product = Products.model_validate(product)
     session.add(db_product)
     await session.commit()
     return {"message": "user created successfully!"}"""
-    return await ProductController(session=session).post_product_controller(session, product)
+    return await ProductController(session=session).post_product_controller(product)
 
 @router.get("/")
 async def read_products(*, session: AsyncSession = Depends(get_session),):
     """statement = select(Products)
     result = await session.execute(statement=statement)
     return result.scalars()"""
-    return await ProductController(session=session).get_products_controller(session) 
+    return await ProductController(session=session).get_products_controller() 
 
 @router.get("/{product_title}")
 async def read_products(*, session: AsyncSession = Depends(get_session), title: str,):
     """statement = select(Products).where(Products.id == product_id)
     result = await session.execute(statement=statement)
     return result.scalar_one()"""
-    return await ProductController(session=session).get_product_controller(session=session, title=title)
+    return await ProductController(session=session).get_product_controller(title=title)
 
 @router.delete("/{product_id}")
 async def delete_product(*, session: AsyncSession = Depends(get_session), title: str):
@@ -48,8 +48,8 @@ async def delete_product(*, session: AsyncSession = Depends(get_session), title:
     await session.commit()
     
     return {"message": "user deleted successfully! "}"""
-    return await ProductController(session=session).delete_product_controller(session, title=title)
+    return await ProductController(session=session).delete_product_controller(title=title)
 
 @router.patch ("/")
 async def update_product(*, session: AsyncSession = Depends(get_session), product: ProductUpdate):
-    return await ProductController(session=session).update_product_controller(session, product)
+    return await ProductController(session=session).update_product_controller(product)
