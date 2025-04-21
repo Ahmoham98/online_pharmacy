@@ -18,7 +18,7 @@ class OrderController:
     
     async def get_orders_controller(self):
         statement = select(Orders)
-        result = await self.session.exc(statement)
+        result = await self.session.exec(statement)
         result = result.all()
         return result
     
