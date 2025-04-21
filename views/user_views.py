@@ -1,29 +1,37 @@
-from datetime import datetime, timedelta, timezone
+#//////////////////// Typing, Date and time importations ////////////////////////
 from typing import Annotated
+from datetime import timedelta
 
-import jwt
-from sqlmodel import Session, select
+#//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from dependency import engine
-from database import async_engine
+#//////////////////// Asyncsession ////////////////////////
 from database import get_session
+
+#//////////////////// Models and Schemas importations ////////////////////////
 from schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
 from models.users import Users
+from schema.Authentication_Token_schema import Token, TokenData
+
+#//////////////////// Controllers class importation ////////////////////////
+from controllers.user_controller import UserController
+
+
+#//////////////////// authentication importation ////////////////////////
+from views.Authentication import authenticate_user, create_access_token, get_current_user
 
 #from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
-import bcrypt
 
+#//////////////////// Redis and decoration importation ////////////////////////
 import json
 from functools import wraps
 import redis
 # asynchronous redis connection is not working when try using aiocache even with having the aiocache library installed 
 # check for the requirements...
 #from aiocache import Cache
-from fastapi import HTTPException
 
 
 # cache response decorator
@@ -60,120 +68,12 @@ def cache_response(ttl: int = 60, namespace: str = "main"):
         return wrapper
     return decorator
 
-
-# openssl rand -hex 32
-SECRET_KEY = "f24bfbb639da735d4ebb1fbf5d442fa9c2269295b6d7a2502b998485e5f92746"
-ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 router = APIRouter()
 
-"""get_user_auth
-Args:
-username (str): username to authenticate
 
-Returns:
-user_in_db: user object from database if authenticated
-
-Description:
-used to authenticate a user. It takes a username as an argument and returns the user
-"""
-def get_user_auth(              # The session connection need to changed to asyncsession
-    username: str,
-):
-    with Session(engine) as session:
-        user_in_db = session.exec(select(Users).where(Users.username == username)).first()
-        if user_in_db:
-            return user_in_db
-        else:
-            raise HTTPException(status_code=400, detail="user with the given username cannot be found in database...")
-
-"""authenticate_user
-Args:
-username (str): username to authenticate
-password (str): password to authenticate
-
-Returns:
-user (User): user object if authentication is successful
-
-Description:
-authenticate user with the given username and password
-"""
-def authenticate_user(username: str, password: str):
-    db_user = get_user_auth(username)
-    if not db_user:
-        return False
-    # cahnging password and hashed password strign object to pybyte for bcrypt.checkpw usage
-    password = password.encode()
-    hashed_password = db_user.hashed_password.encode()
-    if not bcrypt.checkpw(password, hashed_password):
-        return False
-    return db_user
-
-"""create_access_token
-Args:
-data (dict): data to be encoded in token // data dict type should be in jwt format for encoding and decoding process
-expires_delta (timedelta): time after which token expires
-
-Returns:
-token (str): access token
-
-Description:
-create access token using pyjwt library
-for pyjwt library:
-    pip install pyjwt
-"""
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-"""get_current_user
-Args:
-token (str): access token
-Returns:
-user (User): user object
-
-Description:
-get current user using access token
-"""
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)]
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except jwt.InvalidTokenError:
-        raise credentials_exception
-    user = get_user_auth(username=token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
-
-from controllers.user_controller import UserController
 @router.get("/", response_model=list[UsersPublic])
 async def get_users(*, session: AsyncSession = Depends(get_session)):
     """ 
@@ -182,7 +82,7 @@ async def get_users(*, session: AsyncSession = Depends(get_session)):
     #return await get_users_controller(session)
     result = await UserController(session=session).get_users_controller()
     return result
-
+ 
 #Creating a post request endpoint to /users
 @router.post("/", response_model=UsersPublic)
 async def create_user(*, session: AsyncSession = Depends(get_session), user : UsersCreate):
@@ -285,6 +185,7 @@ async def update_user(*, session: AsyncSession = Depends(get_session), user: Use
     result = await UserController(session=session).update_user_controller(user=user)
     return result
 
+#unit testing passed
 @router.post("/login")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -302,7 +203,7 @@ async def login_for_access_token(
     )
     return Token(access_token=access_token, token_type="bearer")
 
-
+#unit testing passed
 @router.get("/me", response_model=UsersPublic)
 async def read_user_me(
     current_user: Annotated[Users, Depends(get_current_user)]
