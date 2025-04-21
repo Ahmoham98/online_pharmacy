@@ -17,9 +17,9 @@ class CategoryController:
         await self.session.refresh(db_category_item)
         return db_category_item
     
-    async def get_categories_controller(session: AsyncSession):
+    async def get_categories_controller(self):
         statement = select(Categories)
-        result = await session.exec(statement)
+        result = await self.session.exec(statement)
         result = result.all()
         return result
     
