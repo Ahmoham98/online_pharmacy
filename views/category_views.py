@@ -1,13 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import select
+#//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi import (
+    APIRouter,
+    Depends,
+)
 
-
+#//////////////////// Asyncsession ////////////////////////
 from database import get_session
 
-from models.categories import Categories
-from schema.categories_schema import CategoriesBase, CategoriesCreate, CategoriesPublic, CategoriesUpdate
+#//////////////////// Models and Schemas importations ////////////////////////
+from schema.categories_schema import (
+    CategoriesCreate,
+    CategoriesPublic,
+    CategoriesUpdate
+)
 
+#//////////////////// Controllers class importation ////////////////////////
 from controllers.category_controller import CategoryController
 #from controllers.category_controller import post_category_controller, get_categories_controller, get_category_controller, delete_category_cotroller, update_category_controller
 

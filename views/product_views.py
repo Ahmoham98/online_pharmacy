@@ -1,12 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import select
+#//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi import (
+    APIRouter,
+    Depends,
+)
 
+#//////////////////// Asyncsession ////////////////////////
 from database import get_session
 
+#//////////////////// Models and Schemas importations ////////////////////////
 from models.products import Products
-from schema.products_schema import Productsbase, ProductsCreate, ProductsPublic, ProductUpdate
+from schema.products_schema import (
+    Productsbase,
+    ProductsCreate,
+    ProductsPublic,
+    ProductUpdate
+)
 
+#//////////////////// Controllers class importation ////////////////////////
 from controllers.product_controller import ProductController
 #from controllers.product_controller import post_product_controller, get_products_controller, get_product_controller, delete_product_controller, update_product_controller
 

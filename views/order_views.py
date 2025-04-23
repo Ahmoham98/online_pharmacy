@@ -1,12 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import select
+#//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi import (
+    APIRouter,
+    Depends,
+)
 
+#//////////////////// Asyncsession ////////////////////////
 from  database import get_session
 
-from models.orders import Orders
-from schema.orders_schema import OrderBase, Ordercreate, OrderPublic, OrderUpdate
+#//////////////////// Models and Schemas importations ////////////////////////
+from schema.orders_schema import (
+    Ordercreate,
+    OrderPublic,
+    OrderUpdate
+)
 
+#//////////////////// Controllers class importation ////////////////////////
 from controllers.order_controller import OrderController
 #from controllers.order_controller import post_order_controller, get_orders_controller, get_order_controller, delete_order_controller, update_order_controller
 

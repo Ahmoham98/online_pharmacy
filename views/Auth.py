@@ -1,6 +1,10 @@
 #//////////////////// Typing, Date and time importations ////////////////////////
-from datetime import datetime, timedelta, timezone
 from typing import Annotated
+from datetime import (
+    datetime,
+    timedelta,
+    timezone
+)
 
 #//////////////////// Fastapi, sqlmodels and pydantic importations ////////////////////////
 from fastapi import HTTPException, Depends

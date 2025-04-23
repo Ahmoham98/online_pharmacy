@@ -1,14 +1,22 @@
 #//////////////////// Typing, Date and time importations ////////////////////////
 from typing import Annotated
-from datetime import datetime, timedelta, timezone
+from datetime import (
+    datetime,
+    timedelta,
+    timezone
+)
 
 #//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
-from fastapi import HTTPException, Depends, status
-from sqlmodel import Session, select
+from fastapi import (
+    HTTPException,
+    Depends,
+    status
+)
+from sqlmodel import select
 
 #//////////////////// Models and schemas ////////////////////////
 from models.users import Users
-from schema.Authentication_Token_schema import Token, TokenData
+from schema.Authentication_Token_schema import TokenData
 
 #//////////////////// fastapi ////////////////////////
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -16,10 +24,6 @@ from fastapi.security import OAuth2PasswordBearer
 
 #//////////////////// jwt for encode and decode ////////////////////////
 import jwt
-
-#//////////////////// engine and Asyncengine ////////////////////////
-from dependency import engine
-from database import async_engine
 
 #//////////////////// hashing ////////////////////////
 import bcrypt

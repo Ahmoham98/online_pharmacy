@@ -3,27 +3,40 @@ from typing import Annotated
 from datetime import timedelta
 
 #//////////////////// fastapi, sqlmodel and pydantic importations ////////////////////////
-from fastapi import APIRouter, Depends, HTTPException, status, Header
 from fastapi import HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Header
+)
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm
+)
 
 #//////////////////// Asyncsession ////////////////////////
 from database import get_session
 
 #//////////////////// Models and Schemas importations ////////////////////////
-from schema.users_schema import UsersBase, UsersCreate, UsersPublic, UsersUpdate, UserInDB
 from models.users import Users
-from schema.Authentication_Token_schema import Token, TokenData
+from schema.Authentication_Token_schema import Token
+from schema.users_schema import (
+    UsersCreate,
+    UsersPublic,
+    UsersUpdate,
+)
 
 #//////////////////// Controllers class importation ////////////////////////
 from controllers.user_controller import UserController
-
+#from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
 
 #//////////////////// authentication importation ////////////////////////
-from views.Authentication_before_async_connection import authenticate_user, create_access_token, get_current_user
-
-#from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
+from views.Authentication_before_async_connection import (
+    get_current_user
+)
 
 #//////////////////// Redis and decoration importation ////////////////////////
 import json
@@ -213,10 +226,9 @@ async def login_for_access_token(
 @router.get("/me", response_model=UsersPublic)
 async def read_user_me(
     access_token: Annotated[Token, Header()],
-    current_user: Annotated[Users, Depends(get_current_user)]
+    current_user: Annotated[Users, Depends(get_current_user)] #sould be pass new async authenticate_user_with_jwt
 ):
     return current_user
-
 
 
 @router.get("/{some_test}")
