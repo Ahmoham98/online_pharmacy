@@ -6,7 +6,9 @@ from views import user_views, product_views, order_views, order_item_views, cate
 import uvicorn
 
 from database import async_engine
-from models import users, products, orders, order_items, categories
+
+
+from contextlib import asynccontextmanager
 
 
 DEFAULT_EXPIRATION = 3600
@@ -82,6 +84,17 @@ tags_metadata = [
     },
 ]
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    #Load the database
+    await create_db_tables()
+    
+    yield
+    
+    #
+
+
 app = FastAPI(
     title="Online Pharmacy API's",
     description=description,
@@ -89,6 +102,7 @@ app = FastAPI(
     version="0.0.7",
     openapi_tags=tags_metadata
 )
+
 # cors middleware for controlling data access via origin
 origins = [
     "http://localhost:8000",
@@ -122,10 +136,6 @@ async def create_db_tables():
         await conn.run_sync(SQLModel.metadata.create_all)
 
 
-async def main():
-    await create_db_tables()
-
-
 @app.on_event("startup")
 async def on_startup():
     await create_db_tables()
@@ -157,6 +167,7 @@ class LoadBalancer ():
 
 load_balancer = LoadBalancer(servers=servers)
 
+#proxy for handle request among servers
 @app.get("/{path:path}")
 @app.post("/{path:path}")
 @app.put("/{path:path}")
@@ -228,4 +239,3 @@ async def read_item(item_id: int, cache: Cache = Depends(get_cache)):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=5000, log_level="info")
-    main()
