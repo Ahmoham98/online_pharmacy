@@ -10,7 +10,7 @@ from fastapi import (
     Depends,
     HTTPException,
     status,
-    Header
+    Query
 )
 from fastapi.security import (
     OAuth2PasswordBearer,
@@ -31,12 +31,6 @@ from schema.users_schema import (
 
 #//////////////////// Controllers class importation ////////////////////////
 from controllers.user_controller import UserController
-#from controllers.user_controller import get_users_controller, post_user_controller , get_user_controller, delete_user_controller, update_user_controller
-
-#//////////////////// authentication importation ////////////////////////
-from views.Authentication_before_async_connection import (
-    get_current_user
-)
 
 #//////////////////// Redis and decoration importation ////////////////////////
 import json
@@ -81,8 +75,12 @@ def cache_response(ttl: int = 60, namespace: str = "main"):
         return wrapper
     return decorator
 
+
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
 
 router = APIRouter(
     prefix="/users"
@@ -94,36 +92,24 @@ async def get_users(*, session: AsyncSession = Depends(get_session)):
     """ 
         Handles get_all user requests and hand it over to the backend to get all the users 
     """
-    #return await get_users_controller(session)
     result = await UserController(session=session).get_users_controller()
     return result
- 
+
 #Creating a post request endpoint to /users
 @router.post("/", response_model=UsersPublic)
 async def create_user(*, session: AsyncSession = Depends(get_session), user : UsersCreate):
-    """db_user = Users.model_validate(user)
-    session.add(db_user)
-    await session.commit() 
-    return {"message": "user created successfully!"} """ # return a message to the client
-    #return await post_user_controller(session, user)
+    """
+        Handles post user request and hand it over to the backend to create a new user with given data
+    """
     result = await UserController(session=session).post_user_controller(user=user)
     return result
 
 #Creating get request endpoint with sending parameters to /users with /users/{id}  done *_*
-# was working by adding redis decoration, some error from redis.__init__ happen, need to be check...
 @router.get("/{username}/")
-#@cache_response(ttl=120, namespace="users")
 async def get_user(*, session: AsyncSession = Depends(get_session), username: str):
     """ 
         Handles get user requests with the given username and hand it over to the backend to get the user with the given username
     """
-    #statement = select(Users).where(Users.username == username)
-    #result = await session.exec(statement)
-    #return result.first()
-    
-    
-    #return await get_user_controller(session, username)
-    
     result = await UserController(session=session).get_user_controller(username=username)
     return result
 
@@ -132,18 +118,6 @@ async def delete_user(*, session: AsyncSession = Depends(get_session), username:
     """
         Handles delete requests and hand it over to the backend to manage delete operation
     """
-    #statement = select(Users).where(Users.username == username)
-    #result = await session.exec(statement=statement)
-    #result = result.first()
-    #if not result:
-    #    raise HTTPException(status_code=404, detail="user with given username not found!")
-    #await session.delete(result)
-    #await session.commit()
-    #return {"message": "user have been deleted succesfully!"}"""
-    
-    
-    #return await delete_user_controller(session, username )
-    
     result = await UserController(session=session).delete_user_controller(username=username)
     return result
 
@@ -152,51 +126,6 @@ async def update_user(*, session: AsyncSession = Depends(get_session), user: Use
     """
         Handles partial update and send it over to the backend to manage the update oparation
     """
-    """db_user = await session.execute(select(Users).where(user.username == Users.username))
-    db_user = db_user.scalar()
-    if user.username is None:
-        raise HTTPException(status_code=405, detail="username field required")
-    elif user.username == "string":
-        raise HTTPException(status_code=405, detail="username field required")
-    else:
-        db_user.username = user.username
-    
-    #troubleshooting
-    print(f"db_user username is {db_user.username}")
-    print(f"db_user email address is {db_user.email}")
-    print(f"db_user address is {db_user.address}")
-    print(f"user input address is {user.address}")
-    
-    if user.password is not None:
-        db_user.password = user.password
-        
-    if user.email is not None:
-        db_user.email = user.email
-    
-    if user.phone is not None:
-        db_user.phone = db_user.phone
-    
-    if user.first_name is not None:
-        db_user.first_name = user.first_name
-    
-    if user.last_name is not None:
-        db_user.last_name = user.last_name
-    
-    if user.address is not None:
-        print ("address filed is not none ")
-        db_user.address = user.address
-    
-    if user.role is not None:
-        db_user.role = user.role
-    
-    if user.created_at is not None:
-        db_user.created_at = user.created_at
-    print (f"db_user is {db_user}")
-    session.add(db_user)
-    await session.commit()
-    return {"massage": "success!"}"""
-    #return await update_user_controller(session, user)
-    
     result = await UserController(session=session).update_user_controller(user=user)
     return result
 
@@ -225,10 +154,20 @@ async def login_for_access_token(
 #unit testing passed
 @router.get("/me", response_model=UsersPublic)
 async def read_user_me(
-    access_token: Annotated[Token, Header()],
-    current_user: Annotated[Users, Depends(get_current_user)] #sould be pass new async authenticate_user_with_jwt
+    *, 
+    session: AsyncSession = Depends(get_session),
+    token: Annotated[Token, Query()] = None, #should be pass new async authenticate_user_with_jwt
+    
 ):
+    current_user = await Authentication(session=session).authenticate_user_with_jwt(token)
     return current_user
+
+
+
+
+
+
+
 
 
 @router.get("/{some_test}")
@@ -245,11 +184,13 @@ async def get_authentication(
 async def current_user_authentication(token: Token):
     result = await Authentication.authenticate_user_with_jwt(token=token)
 
+
+
+
+
 #handling returning responses using fastapi
 from fastapi.responses import JSONResponse
 from fastapi import Body
-
-
 
 #///////////////////////////// testing nedpoint response handling code section bellow ////////////////////////////////////////
 
@@ -271,17 +212,3 @@ async def some_response_to_request(
         items[item_id] = item
         return JSONResponse(status_code=status.HTTP_201_CREATED, content=item)
 
-
-
-"""from fastapi.routing import APIRoute
-
-@router.get("/path_op_config/operationId/{this}", operation_id="test_operation_id")
-async def test_operation_id():
-    return [{"item_id": "Foo"}]
-
-def test_operation_id(app: FastAPI) -> None:
-    for route in app.routes:
-        if isinstance(route, APIRoute):
-            route.operation_id = route.name         # in this case, 'read item'
-
-test_operation_id(router)"""

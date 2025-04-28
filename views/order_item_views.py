@@ -17,7 +17,8 @@ from schema.order_items_schema import (
 
 #//////////////////// Controllers class importation ////////////////////////
 from controllers.order_items_controller import OrderItemsController
-#from controllers.order_items_controller import post_order_items_controller, get_order_items_controller, get_order_item_controller, delete_order_item_controller, update_order_item_controller
+
+
 
 router = APIRouter(
     prefix="/order_items",
