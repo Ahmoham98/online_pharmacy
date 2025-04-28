@@ -6,11 +6,11 @@ from models.users import Users
 import bcrypt
 
 
-
 #Password hasher
 async def get_password_hash(password):
     password = password.encode()
     return bcrypt.hashpw(password, bcrypt.gensalt())
+
 
 class UserController:
     def __init__(self, session: AsyncSession):
@@ -32,8 +32,7 @@ class UserController:
         if not result:
             raise HTTPException(status_code=404, detail="User with given username not found!... ")
         return result
-    
-    
+
     #POST Functionalities
     async def post_user_controller(self, user: UsersCreate):
         hashed_password = await get_password_hash(user.password)
