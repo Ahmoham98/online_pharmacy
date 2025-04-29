@@ -14,6 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 #//////////////////// Models and schemas ////////////////////////
 from models.users import Users
+from schema.users_schema import UsersPublic
 from schema.Authentication_Token_schema import TokenData, Token
 
 #//////////////////// hashing ////////////////////////
@@ -27,7 +28,7 @@ SECRET_KEY = "f24bfbb639da735d4ebb1fbf5d442fa9c2269295b6d7a2502b998485e5f92746"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 class Authentication:
@@ -108,9 +109,11 @@ class Authentication:
     """
     #Annotated[str, Depends(oauth2_scheme)]
     #token: Token
-    async def authenticate_user_with_jwt(self, token: Annotated[str, Depends(oauth2_scheme)]):
+    async def authenticate_user_with_jwt(self, token: Annotated[str, Depends(oauth2_scheme)]) -> UsersPublic | None:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+            if not payload:
+                return payload
             username = payload.get("sub")
             if username is None:
                 raise HTTPException(status_code=410, detail="... username has not been received1 ...")
