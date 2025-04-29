@@ -19,6 +19,7 @@ class Users(SQLModel, table=True):
     address: str | None = None
     role: str | None = None
     created_at: str | None = None
+    is_superuser: bool | None = False
 
     orders: list["Orders"] = Relationship(back_populates="users")
     products: list["Products"] = Relationship(back_populates="users")
