@@ -5,6 +5,9 @@ for configuring database using pydantic settings for using .env parameters and a
         Pydantic_settings library doe's not recognized even it have been installed using pip package manager
             ==> Although the code is actually set
 
+
+
+#done
 ////////////////////////////////////////////////// level one consideration level ///////////////////////////////////////////////////////////
 username and password Authentication code stop working after changing the database connection engine and session into Asynchronous
     functions for Authentication are as follows:
