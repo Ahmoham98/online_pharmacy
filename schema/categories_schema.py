@@ -8,7 +8,7 @@ class CategoriesBase(SQLModel):
 
 # Categories Input model
 class CategoriesCreate(CategoriesBase):
-    created_at: str | None = None
+    created_at: str | None = "now"
 
 # Categories Output models
 class CategoriesPublic(CategoriesBase):

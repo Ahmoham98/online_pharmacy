@@ -23,7 +23,6 @@ class ProductsPublic(Productsbase):
     category_id: int
     users_id: int
 
-
 #Products Update(Patch) model
 class ProductUpdate(SQLModel):
     title: str | None = None

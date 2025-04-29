@@ -13,7 +13,6 @@ class OrderItemsCreate(OrderItemsBase):
     status: str
     total_price: int
 
-
 # Order_items Output model
 class OrderItemsPublic(OrderItemsBase):
     id: int

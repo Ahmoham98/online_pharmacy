@@ -17,9 +17,9 @@ class OrderBase(SQLModel):
 
 # Orders Input model
 class Ordercreate(OrderBase):
-    email: EmailStr | None = None
-    coupon: str | None = None
-    discount: str | None = None
+    email: EmailStr | None = "None"
+    coupon: str | None = "None"
+    discount: str | None = "None"
 
 # Orders Output model
 class OrderPublic(OrderBase):

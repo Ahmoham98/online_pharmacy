@@ -21,7 +21,7 @@ class UsersCreate(UsersBase):
     password: str
     email: EmailStr | None = None
     phone: int | None = None
-    address: str | None = None
+    address: str | None = "None"
     created_at: str = Field(default="now")
 
 # User Output model
