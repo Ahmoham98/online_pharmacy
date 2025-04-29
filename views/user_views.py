@@ -10,7 +10,6 @@ from fastapi import (
     Depends,
     HTTPException,
     status,
-    Query
 )
 from fastapi.security import (
     OAuth2PasswordBearer,
@@ -31,6 +30,11 @@ from schema.users_schema import (
 
 #//////////////////// Controllers class importation ////////////////////////
 from controllers.user_controller import UserController
+
+
+#//////////////////// dependencies importation ////////////////////////
+from dependency import get_current_active_superuser
+
 
 #//////////////////// Redis and decoration importation ////////////////////////
 import json
@@ -78,19 +82,24 @@ def cache_response(ttl: int = 60, namespace: str = "main"):
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 
 router = APIRouter(
-    prefix="/users"
+    prefix="/users",
+    tags=["Users"]
 )
 
-
 @router.get("/", response_model=list[UsersPublic], openapi_extra={"x-aperture-labs-portal": "blue"}, operation_id="users_getusers_userviews_getall")
-async def get_users(*, session: AsyncSession = Depends(get_session)):
+async def get_users(
+    *,
+    session: AsyncSession = Depends(get_session),
+    username: str = Depends(get_current_active_superuser),
+):
     """ 
         Handles get_all user requests and hand it over to the backend to get all the users 
+            ** you need admin access for this operation **
     """
     result = await UserController(session=session).get_users_controller()
     return result
@@ -105,20 +114,31 @@ async def create_user(*, session: AsyncSession = Depends(get_session), user : Us
     return result
 
 #Creating get request endpoint with sending parameters to /users with /users/{id}  done *_*
-@router.get("/{username}/")
-async def get_user(*, session: AsyncSession = Depends(get_session), username: str):
+@router.get("/{user_username}/")
+async def get_user(
+    *,
+    session: AsyncSession = Depends(get_session),
+    user_username: str,
+    username: str = Depends(get_current_active_superuser),
+):
     """ 
         Handles get user requests with the given username and hand it over to the backend to get the user with the given username
+            ** you need admin access for this operation **
     """
-    result = await UserController(session=session).get_user_controller(username=username)
+    result = await UserController(session=session).get_user_controller(username=user_username)
     return result
 
-@router.delete("/{username}")
-async def delete_user(*, session: AsyncSession = Depends(get_session), username: str):
+@router.delete("/{user_username}")
+async def delete_user(
+    *,
+    session: AsyncSession = Depends(get_session),
+    user_username: str,
+    username: str = Depends(get_current_active_superuser),
+):
     """
         Handles delete requests and hand it over to the backend to manage delete operation
     """
-    result = await UserController(session=session).delete_user_controller(username=username)
+    result = await UserController(session=session).delete_user_controller(username=user_username)
     return result
 
 @router.patch ("/")
@@ -151,16 +171,18 @@ async def login_for_access_token(
     )
     return Token(access_token=access_token, token_type="bearer")
 
+
 #unit testing passed
 @router.get("/me", response_model=UsersPublic)
 async def read_user_me(
-    *, 
+    *,
     session: AsyncSession = Depends(get_session),
-    token: Annotated[Token, Query()] = None, #should be pass new async authenticate_user_with_jwt
-    
+    token: str = Depends(oauth2_scheme),
 ):
-    current_user = await Authentication(session=session).authenticate_user_with_jwt(token)
-    return current_user
+    user = await Authentication(session=session).authenticate_user_with_jwt(token=token)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid ot expired token", headers={"WWW-Authenticate": "Bearer"})
+    return user
 
 
 

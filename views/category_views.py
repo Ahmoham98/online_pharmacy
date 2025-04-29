@@ -23,25 +23,27 @@ router = APIRouter(
     tags=["categories"],
 )
 
+#//////////////////// dependencies importation ////////////////////////
+from dependency import get_current_active_superuser
 
 @router.post("/", response_model=CategoriesPublic)
-async def create_order(*, session: AsyncSession = Depends(get_session), category_item: CategoriesCreate,):
+async def create_order(*, session: AsyncSession = Depends(get_session), category_item: CategoriesCreate, username: str = Depends(get_current_active_superuser),):
     return await CategoryController(session=session).post_category_controller(category_item=category_item)
 
 @router.get("/")            # need to be fixed
-async def get_orders(*, session: AsyncSession = Depends(get_session),):
+async def get_orders(*, session: AsyncSession = Depends(get_session), username: str = Depends(get_current_active_superuser),):
     return await CategoryController(session=session).get_categories_controller()
 
 @router.get("/{category_name}")
-async def get_order(*, session: AsyncSession = Depends(get_session), name: str,):
+async def get_order(*, session: AsyncSession = Depends(get_session), name: str, username: str = Depends(get_current_active_superuser),):
     return await CategoryController(session=session).get_category_controller(name=name)
 
 @router.delete("/{category_id}")
-async def delete_user(*, session: AsyncSession = Depends(get_session), name: str):
+async def delete_user(*, session: AsyncSession = Depends(get_session), name: str, username: str = Depends(get_current_active_superuser),):
     return await CategoryController(session=session).delete_category_cotroller(name=name)
 
 @router.patch ("/")
-async def update_category(*, session: AsyncSession = Depends(get_session), category: CategoriesUpdate):
+async def update_category(*, session: AsyncSession = Depends(get_session), category: CategoriesUpdate, username: str = Depends(get_current_active_superuser),):
     return await CategoryController(session=session).update_category_controller(category=category)
 
 
