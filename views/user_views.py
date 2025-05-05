@@ -88,7 +88,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 router = APIRouter(
     prefix="/users",
-    tags=["Users"]
+    tags=["users"]
 )
 
 @router.get("/", response_model=list[UsersPublic], openapi_extra={"x-aperture-labs-portal": "blue"}, operation_id="users_getusers_userviews_getall")
@@ -123,7 +123,7 @@ async def get_user(
 ):
     """ 
         Handles get user requests with the given username and hand it over to the backend to get the user with the given username
-            ** you need admin access for this operation **
+            ** you need admin access for this operation **          make sure you type valid email, it will be used for your password recovery
     """
     result = await UserController(session=session).get_user_controller(username=user_username)
     return result
