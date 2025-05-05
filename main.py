@@ -100,7 +100,8 @@ app = FastAPI(
     description=description,
     summary="Online Pharmacy: save time by getting requirements online...",
     version="0.0.7",
-    openapi_tags=tags_metadata
+    openapi_tags=tags_metadata,
+    lifespan=lifespan
 )
 
 # cors middleware for controlling data access via origin
